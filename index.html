@@ -10,7 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/shpjs@6.2.0/dist/shp.min.js"></script>
@@ -20,645 +19,407 @@
 
 <style>
 :root {
-  --bg:#08111b;
-  --panel:#101d2b;
-  --panel2:#142438;
-  --line:#24374a;
-  --text:#e7f0f7;
-  --muted:#8ba0b3;
-  --green:#31c48d;
-  --blue:#4e9fff;
-  --orange:#f4a340;
-  --red:#f06d69;
-  --purple:#ad91ff;
-  --cyan:#49d5d0;
+ --bg:#08111b;
+ --panel:#101d2b;
+ --panel2:#142438;
+ --line:#24374a;
+ --text:#e7f0f7;
+ --muted:#8ba0b3;
+ --green:#31c48d;
+ --blue:#4e9fff;
+ --orange:#f4a340;
+ --red:#f06d69;
+ --purple:#ad91ff;
+ --cyan:#49d5d0;
 }
-
 *{box-sizing:border-box}
-
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Manrope,Arial,sans-serif;
-  overflow:hidden;
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Manrope,Arial,sans-serif;overflow:hidden;
 }
-
 header{
-  height:66px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 20px;
-  background:#0b1724;
-  border-bottom:1px solid var(--line);
+ height:66px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 20px;background:#0b1724;border-bottom:1px solid var(--line);
 }
-
 .brand{display:flex;align-items:center;gap:12px}
-
 .logo{
-  width:38px;
-  height:38px;
-  border-radius:10px;
-  display:grid;
-  place-items:center;
-  background:#123b39;
-  color:var(--green);
-  font-size:20px;
-  font-weight:800;
+ width:38px;height:38px;border-radius:10px;
+ display:grid;place-items:center;background:#123b39;
+ color:var(--green);font-size:20px;font-weight:800;
 }
-
 .brand h1{font-size:15px;margin:0;letter-spacing:.6px}
 .brand p{font-size:9px;color:var(--muted);margin:3px 0 0;letter-spacing:1.5px}
-
 .header-right{display:flex;align-items:center;gap:12px}
-
 .status{
-  color:var(--green);
-  font-size:10px;
-  border:1px solid #22634f;
-  border-radius:20px;
-  padding:7px 10px;
+ color:var(--green);font-size:10px;border:1px solid #22634f;
+ border-radius:20px;padding:7px 10px;
 }
-
 .clock{font:11px "DM Mono",monospace;color:var(--muted)}
-
 .workspace{
-  height:calc(100vh - 66px);
-  display:grid;
-  grid-template-columns:minmax(260px,1fr) minmax(360px,1fr) minmax(260px,1fr);
-  gap:8px;
-  padding:8px;
-  min-height:0;
+ height:calc(100vh - 66px);
+ display:grid;grid-template-columns:1fr 1fr 1fr;
+ gap:8px;padding:8px;min-height:0;
 }
-
 .panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:9px;
-  min-width:0;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:9px;min-width:0;min-height:0;
+ display:flex;flex-direction:column;overflow:hidden;
 }
-
 .panel-heading{
-  padding:13px 15px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-shrink:0;
+ padding:13px 15px;border-bottom:1px solid var(--line);
+ display:flex;justify-content:space-between;align-items:center;
+ flex-shrink:0;
 }
-
 .panel-heading h2{font-size:12px;letter-spacing:1px;margin:0}
 .panel-heading span{font:9px "DM Mono",monospace;color:var(--muted)}
-
 .panel-body{padding:14px;overflow-y:auto;min-height:0;flex:1}
-
 .panel-body::-webkit-scrollbar{width:5px}
 .panel-body::-webkit-scrollbar-thumb{background:#30465b;border-radius:8px}
-
 .section{margin-bottom:18px}
-
 .section-title{
-  font-size:10px;
-  color:var(--green);
-  font-weight:800;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
-  margin-bottom:10px;
+ font-size:10px;color:var(--green);font-weight:800;
+ letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px;
 }
-
 label{font-size:10px;color:var(--muted);display:block;margin-bottom:5px}
-
-select,input[type=file]{
-  width:100%;
-  background:#0a1725;
-  border:1px solid var(--line);
-  border-radius:5px;
-  color:var(--text);
-  padding:9px;
-  font:11px Manrope;
-  outline:none;
+select,input[type=file],input[type=text]{
+ width:100%;background:#0a1725;border:1px solid var(--line);
+ border-radius:5px;color:var(--text);padding:9px;
+ font:11px Manrope;outline:none;
 }
-
 select:focus,input:focus{border-color:var(--green)}
-
 .field{margin-bottom:11px}
-
 .btn{
-  background:#174a42;
-  border:1px solid #28755e;
-  color:#c7ffeb;
-  padding:9px 12px;
-  border-radius:5px;
-  font:700 10px Manrope;
-  cursor:pointer;
-  width:100%;
-  margin-top:6px;
+ background:#174a42;border:1px solid #28755e;color:#c7ffeb;
+ padding:9px 12px;border-radius:5px;font:700 10px Manrope;
+ cursor:pointer;width:100%;margin-top:6px;
 }
-
 .btn:hover{background:#216454}
 .btn.secondary{background:#172a3c;border-color:#35516a;color:#d6e7f5}
 .btn.orange{background:#49351b;border-color:#805927;color:#ffda9d}
 .btn.danger{background:#422322;border-color:#79403d;color:#ffc3bf}
 .btn:disabled{opacity:.5;cursor:wait}
-
 .check{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin:9px 0;
-  font-size:11px;
-  color:#d2deea;
+ display:flex;align-items:center;gap:8px;margin:9px 0;
+ font-size:11px;color:#d2deea;
 }
-
 .check input{accent-color:var(--green)}
-
 .small{font-size:9px;color:var(--muted);line-height:1.6}
-
 .map-panel{position:relative}
-
-#map{
-  width:100%;
-  height:100%;
-  background:#0a1520;
-}
-
+#map{width:100%;height:100%;background:#0a1520}
 .map-tools{
-  position:absolute;
-  z-index:700;
-  top:12px;
-  left:12px;
-  right:12px;
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  pointer-events:none;
+ position:absolute;z-index:700;top:12px;left:12px;right:12px;
+ display:flex;justify-content:space-between;gap:8px;pointer-events:none;
 }
-
 .map-tools>*{pointer-events:auto}
-
 .map-tag{
-  background:#0b1724ed;
-  border:1px solid #334b5e;
-  border-radius:5px;
-  padding:8px 10px;
-  font-size:9px;
-  color:#d6e7f5;
-  box-shadow:0 2px 10px #0005;
+ background:#0b1724ed;border:1px solid #334b5e;border-radius:5px;
+ padding:8px 10px;font-size:9px;color:#d6e7f5;
+ box-shadow:0 2px 10px #0005;
 }
-
 .map-tag strong{color:var(--green)}
-
 .map-footer{
-  position:absolute;
-  bottom:10px;
-  left:10px;
-  z-index:700;
-  background:#0b1724e8;
-  border:1px solid var(--line);
-  border-radius:5px;
-  padding:7px 9px;
-  font:9px "DM Mono",monospace;
-  color:#c0d1de;
-  pointer-events:none;
+ position:absolute;bottom:10px;left:10px;z-index:700;
+ background:#0b1724e8;border:1px solid var(--line);
+ border-radius:5px;padding:7px 9px;font:9px "DM Mono",monospace;
+ color:#c0d1de;pointer-events:none;
 }
-
 .map-legend{
-  position:absolute;
-  bottom:10px;
-  right:10px;
-  z-index:700;
-  background:#0b1724ed;
-  border:1px solid var(--line);
-  border-radius:6px;
-  padding:10px;
-  font-size:9px;
-  min-width:130px;
+ position:absolute;bottom:10px;right:10px;z-index:700;
+ background:#0b1724ed;border:1px solid var(--line);
+ border-radius:6px;padding:10px;font-size:9px;min-width:130px;
 }
-
 .legend-item{display:flex;align-items:center;gap:7px;margin-top:6px}
 .swatch{width:10px;height:10px;border-radius:2px}
-
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
 .kpi{
-  background:var(--panel2);
-  border:1px solid var(--line);
-  padding:12px;
-  border-radius:7px;
-  min-width:0;
+ background:var(--panel2);border:1px solid var(--line);
+ padding:12px;border-radius:7px;min-width:0;
 }
-
 .kpi .name{font-size:9px;color:var(--muted);line-height:1.5}
 .kpi .value{font:20px "DM Mono",monospace;margin-top:7px;overflow-wrap:anywhere}
 .kpi .unit{font-size:9px;color:var(--muted);margin-top:3px}
-
 .chart-box{
-  background:var(--panel2);
-  border:1px solid var(--line);
-  border-radius:7px;
-  padding:12px;
-  margin-bottom:12px;
+ background:var(--panel2);border:1px solid var(--line);
+ border-radius:7px;padding:12px;margin-bottom:12px;
 }
-
 .chart-title{font-size:10px;font-weight:800;margin-bottom:12px}
 .chart-box canvas{max-height:190px}
-
 .message{
-  padding:9px;
-  background:#102b2b;
-  border:1px solid #24564e;
-  color:#b8ead8;
-  font-size:10px;
-  border-radius:5px;
-  line-height:1.5;
+ padding:9px;background:#102b2b;border:1px solid #24564e;
+ color:#b8ead8;font-size:10px;border-radius:5px;line-height:1.5;
 }
-
 .warning{
-  padding:9px;
-  background:#34291a;
-  border:1px solid #70522b;
-  color:#f6d7a3;
-  font-size:10px;
-  border-radius:5px;
-  line-height:1.5;
+ padding:9px;background:#34291a;border:1px solid #70522b;
+ color:#f6d7a3;font-size:10px;border-radius:5px;line-height:1.5;
 }
-
 table{width:100%;border-collapse:collapse;font-size:9px}
 td,th{padding:8px 5px;border-bottom:1px solid var(--line);text-align:left}
 th{color:var(--muted);font-weight:600}
-
 footer{
-  text-align:center;
-  color:#72899c;
-  font-size:9px;
-  padding:12px;
-  border-top:1px solid var(--line);
-  line-height:1.8;
+ text-align:center;color:#72899c;font-size:9px;
+ padding:12px;border-top:1px solid var(--line);line-height:1.8;
 }
-
 #notice{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px}
-
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip{background:#102033;color:#e7f0f7}
-
-.leaflet-popup-content{font-size:11px;line-height:1.6}
-
-.aoi-label{
-  background:#0b1724;
-  border:1px solid var(--green);
-  color:var(--green);
-  border-radius:4px;
-  padding:5px 8px;
-  font-size:10px;
-}
-
 @media(max-width:950px){
-  body{overflow:auto}
-  header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px;padding:12px}
-  .workspace{height:auto;min-height:calc(100vh - 66px);grid-template-columns:1fr}
-  .panel{min-height:430px}
-  .map-panel{height:560px;min-height:560px}
+ body{overflow:auto}
+ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px;padding:12px}
+ .workspace{height:auto;min-height:calc(100vh - 66px);grid-template-columns:1fr}
+ .panel{min-height:430px}
+ .map-panel{height:560px;min-height:560px}
 }
-
 @media(max-width:520px){
-  .brand h1{font-size:12px}
-  .status{display:none}
-  .workspace{padding:5px;gap:6px}
+ .brand h1{font-size:12px}
+ .status{display:none}
+ .workspace{padding:5px;gap:6px}
 }
 </style>
 </head>
 
 <body>
-
 <header>
-  <div class="brand">
-    <div class="logo">G</div>
-    <div>
-      <h1>GBoS GEOAI | URBAN ENVIRONMENT INTELLIGENCE</h1>
-      <p>GAMBIA • SPATIAL MONITORING • ENVIRONMENTAL ANALYTICS</p>
-    </div>
+ <div class="brand">
+  <div class="logo">G</div>
+  <div>
+   <h1>GBoS GEOAI | URBAN ENVIRONMENT INTELLIGENCE</h1>
+   <p>GAMBIA • SPATIAL MONITORING • ENVIRONMENTAL ANALYTICS</p>
   </div>
-
-  <div class="header-right">
-    <div class="status">● GIS WORKSPACE ACTIVE</div>
-    <div class="clock" id="clock">--:--:--</div>
-  </div>
+ </div>
+ <div class="header-right">
+  <div class="status">● GIS WORKSPACE ACTIVE</div>
+  <div class="clock" id="clock">--:--:--</div>
+ </div>
 </header>
 
 <main class="workspace">
 
 <!-- LEFT: CONTROLS -->
-
 <section class="panel">
+ <div class="panel-heading">
+  <h2>01 / CONTROL CENTRE</h2>
+  <span>DATA & LAYERS</span>
+ </div>
+ <div class="panel-body">
 
-  <div class="panel-heading">
-    <h2>01 / CONTROL CENTRE</h2>
-    <span>DATA & LAYERS</span>
+  <div class="section">
+   <div class="section-title">Administrative selection</div>
+   <div class="field">
+    <label>Region</label>
+    <select id="region"><option value="">All regions</option></select>
+   </div>
+   <div class="field">
+    <label>District</label>
+    <select id="district"><option value="">All districts</option></select>
+   </div>
+   <div class="field">
+    <label>Ward</label>
+    <select id="ward"><option value="">All wards</option></select>
+   </div>
+   <button class="btn" id="zoomSelected">ZOOM TO SELECTION</button>
+   <div class="small" style="margin-top:7px">
+    Administrative selectors are populated from your uploaded boundary file.
+   </div>
   </div>
 
-  <div class="panel-body">
-
-    <div class="section">
-      <div class="section-title">Administrative selection</div>
-
-      <div class="field">
-        <label>Region</label>
-        <select id="region">
-          <option value="">All regions</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>District</label>
-        <select id="district">
-          <option value="">All districts</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Ward</label>
-        <select id="ward">
-          <option value="">All wards</option>
-        </select>
-      </div>
-
-      <button class="btn" id="zoomSelected">ZOOM TO SELECTION</button>
-      <button class="btn secondary" id="clearSelection">CLEAR ADMINISTRATIVE SELECTION</button>
-
-      <div class="small" style="margin-top:7px">
-        All spatial analysis is restricted to the selected administrative area.
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Basemap configuration</div>
-
-      <label>Choose basemap</label>
-      <select id="basemap">
-        <option value="street">Street map</option>
-        <option value="satellite">Satellite imagery</option>
-        <option value="hybrid">Hybrid imagery</option>
-        <option value="terrain">Terrain</option>
-      </select>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Environmental layers</div>
-
-      <label class="check"><input type="checkbox" id="showAdmin" checked> Administrative boundaries</label>
-      <label class="check"><input type="checkbox" id="showBuildings" checked> Buildings</label>
-      <label class="check"><input type="checkbox" id="showRoads" checked> Road network</label>
-      <label class="check"><input type="checkbox" id="showGreen" checked> Green spaces / vegetation</label>
-      <label class="check"><input type="checkbox" id="showWater" checked> Water bodies / wetlands</label>
-      <label class="check"><input type="checkbox" id="showIndustry" checked> Industrial / commercial areas</label>
-      <label class="check"><input type="checkbox" id="showEnvironmental" checked> Uploaded environmental vectors</label>
-      <label class="check"><input type="checkbox" id="showCSV" checked> CSV observation points</label>
-      <label class="check"><input type="checkbox" id="showRaster" checked> Uploaded raster layers</label>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Load environmental data</div>
-
-      <div class="field">
-        <label>Administrative boundaries (GeoJSON / ZIP Shapefile)</label>
-        <input type="file" id="adminFile" accept=".geojson,.json,.zip">
-      </div>
-
-      <div class="field">
-        <label>Environmental vector data (GeoJSON / ZIP Shapefile)</label>
-        <input type="file" id="vectorFile" accept=".geojson,.json,.zip">
-      </div>
-
-      <div class="field">
-        <label>Environmental CSV (latitude / longitude)</label>
-        <input type="file" id="csvFile" accept=".csv">
-      </div>
-
-      <div class="field">
-        <label>Raster data (GeoTIFF)</label>
-        <input type="file" id="rasterFile" accept=".tif,.tiff">
-      </div>
-
-      <button class="btn secondary" id="clearUploads">CLEAR UPLOADED DATA</button>
-
-      <div id="notice">Waiting for datasets.</div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Live OpenStreetMap extraction</div>
-
-      <p class="small">
-        Retrieve mapped buildings, roads, parks, vegetation, waterways and industrial features.
-        When an administrative area is selected, the returned features are restricted to that area.
-      </p>
-
-      <button class="btn orange" id="loadOSM">LOAD OSM ENVIRONMENTAL FEATURES</button>
-
-      <div class="small" style="margin-top:7px">
-        For better performance, zoom into an urban area or select a ward before retrieving OSM data.
-        Requires an internet connection and an available Overpass API server.
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Map operations</div>
-
-      <button class="btn secondary" id="resetMap">RESET MAP & FILTERS</button>
-      <button class="btn secondary" id="exportGeo">EXPORT SELECTED AREA GEOJSON</button>
-      <button class="btn secondary" id="exportCSV">EXPORT SELECTED AREA ANALYTICS CSV</button>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Methodological note</div>
-      <div class="warning">
-        Environmental indicators depend on data availability, spatial resolution, observation dates and completeness.
-        OSM features represent mapped objects, not a complete national inventory.
-        Uploaded vector and OSM features are spatially clipped or filtered using the selected administrative boundary.
-      </div>
-    </div>
-
+  <div class="section">
+   <div class="section-title">Basemap configuration</div>
+   <label>Choose basemap</label>
+   <select id="basemap">
+    <option value="street">Street map</option>
+    <option value="satellite">Satellite imagery</option>
+    <option value="hybrid">Hybrid imagery</option>
+    <option value="terrain">Terrain</option>
+   </select>
   </div>
+
+  <div class="section">
+   <div class="section-title">Environmental layers</div>
+   <label class="check"><input type="checkbox" id="showAdmin" checked> Administrative boundaries</label>
+   <label class="check"><input type="checkbox" id="showBuildings" checked> Buildings</label>
+   <label class="check"><input type="checkbox" id="showRoads" checked> Road network</label>
+   <label class="check"><input type="checkbox" id="showGreen" checked> Green spaces / vegetation</label>
+   <label class="check"><input type="checkbox" id="showWater" checked> Water bodies / wetlands</label>
+   <label class="check"><input type="checkbox" id="showIndustry" checked> Industrial / commercial areas</label>
+   <label class="check"><input type="checkbox" id="showRaster" checked> Uploaded raster layers</label>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Load environmental data</div>
+   <div class="field">
+    <label>Administrative boundaries (GeoJSON / ZIP Shapefile)</label>
+    <input type="file" id="adminFile" accept=".geojson,.json,.zip">
+   </div>
+   <div class="field">
+    <label>Environmental vector data (GeoJSON / ZIP Shapefile)</label>
+    <input type="file" id="vectorFile" accept=".geojson,.json,.zip">
+   </div>
+   <div class="field">
+    <label>Environmental CSV (latitude / longitude)</label>
+    <input type="file" id="csvFile" accept=".csv">
+   </div>
+   <div class="field">
+    <label>Raster data (GeoTIFF)</label>
+    <input type="file" id="rasterFile" accept=".tif,.tiff">
+   </div>
+   <button class="btn secondary" id="clearUploads">CLEAR UPLOADED DATA</button>
+   <div id="notice">Waiting for datasets.</div>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Live OpenStreetMap extraction</div>
+   <p class="small">
+    Retrieve mapped buildings, roads, parks, vegetation, waterways and industrial features within the current map extent.
+   </p>
+   <button class="btn orange" id="loadOSM">LOAD OSM ENVIRONMENTAL FEATURES</button>
+   <div class="small" style="margin-top:7px">
+    Requires an internet connection and an available Overpass API server. Large national requests may time out; zoom into an urban area first.
+   </div>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Map operations</div>
+   <button class="btn secondary" id="resetMap">RESET MAP & FILTERS</button>
+   <button class="btn secondary" id="exportGeo">EXPORT LOADED VECTOR DATA</button>
+   <button class="btn secondary" id="exportCSV">EXPORT ANALYTICS CSV</button>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Methodological note</div>
+   <div class="warning">
+    Environmental indicators depend on data availability, spatial resolution, observation dates and completeness. OSM features represent mapped objects, not a complete national inventory.
+   </div>
+  </div>
+
+ </div>
 </section>
-
 
 <!-- CENTRE: MAP -->
-
 <section class="panel map-panel">
-
-  <div class="panel-heading">
-    <h2>02 / INTERACTIVE MAP</h2>
-    <span id="mapStatus">GAMBIA NATIONAL VIEW</span>
+ <div class="panel-heading">
+  <h2>02 / INTERACTIVE MAP</h2>
+  <span id="mapStatus">GAMBIA NATIONAL VIEW</span>
+ </div>
+ <div style="position:relative;flex:1;min-height:0">
+  <div id="map"></div>
+  <div class="map-tools">
+   <div class="map-tag"><strong>GBoS GEOAI</strong> / ENVIRONMENT ATLAS</div>
+   <div class="map-tag" id="scaleLabel">WGS84 • EPSG:4326</div>
   </div>
-
-  <div style="position:relative;flex:1;min-height:0">
-
-    <div id="map"></div>
-
-    <div class="map-tools">
-      <div class="map-tag"><strong>GBoS GEOAI</strong> / ENVIRONMENT ATLAS</div>
-      <div class="map-tag" id="scaleLabel">WGS84 • EPSG:4326</div>
-    </div>
-
-    <div class="map-footer">
-      THE GAMBIA • SPATIAL INTELLIGENCE
-    </div>
-
-    <div class="map-legend">
-      <strong>MAP LEGEND</strong>
-      <div class="legend-item"><span class="swatch" style="background:#4e9fff"></span> Buildings</div>
-      <div class="legend-item"><span class="swatch" style="background:#f4a340"></span> Roads</div>
-      <div class="legend-item"><span class="swatch" style="background:#31c48d"></span> Green spaces</div>
-      <div class="legend-item"><span class="swatch" style="background:#49d5d0"></span> Water</div>
-      <div class="legend-item"><span class="swatch" style="background:#ad91ff"></span> Industrial areas</div>
-      <div class="legend-item"><span class="swatch" style="background:#ffffff"></span> AOI boundary</div>
-    </div>
-
+  <div class="map-footer">THE GAMBIA • SPATIAL INTELLIGENCE</div>
+  <div class="map-legend">
+   <strong>MAP LEGEND</strong>
+   <div class="legend-item"><span class="swatch" style="background:#4e9fff"></span> Buildings</div>
+   <div class="legend-item"><span class="swatch" style="background:#f4a340"></span> Roads</div>
+   <div class="legend-item"><span class="swatch" style="background:#31c48d"></span> Green spaces</div>
+   <div class="legend-item"><span class="swatch" style="background:#49d5d0"></span> Water</div>
+   <div class="legend-item"><span class="swatch" style="background:#ad91ff"></span> Industrial areas</div>
   </div>
+ </div>
 </section>
 
-
 <!-- RIGHT: ANALYTICS -->
-
 <section class="panel">
+ <div class="panel-heading">
+  <h2>03 / ANALYTICS CENTRE</h2>
+  <span>LIVE STATISTICS</span>
+ </div>
+ <div class="panel-body">
 
-  <div class="panel-heading">
-    <h2>03 / ANALYTICS CENTRE</h2>
-    <span>LIVE STATISTICS</span>
+  <div class="section">
+   <div class="section-title">Environmental indicators</div>
+   <div class="kpis">
+    <div class="kpi">
+     <div class="name">Mapped buildings</div>
+     <div class="value" id="kBuildings">0</div>
+     <div class="unit">Features</div>
+    </div>
+    <div class="kpi">
+     <div class="name">Road network</div>
+     <div class="value" id="kRoads">0.00</div>
+     <div class="unit">Kilometres</div>
+    </div>
+    <div class="kpi">
+     <div class="name">Green-space area</div>
+     <div class="value" id="kGreen">0.00</div>
+     <div class="unit">Square kilometres</div>
+    </div>
+    <div class="kpi">
+     <div class="name">Water area</div>
+     <div class="value" id="kWater">0.00</div>
+     <div class="unit">Square kilometres</div>
+    </div>
+    <div class="kpi">
+     <div class="name">Industrial features</div>
+     <div class="value" id="kIndustry">0</div>
+     <div class="unit">Features</div>
+    </div>
+    <div class="kpi">
+     <div class="name">Loaded vector features</div>
+     <div class="value" id="kTotal">0</div>
+     <div class="unit">Features</div>
+    </div>
+   </div>
   </div>
 
-  <div class="panel-body">
-
-    <div class="section">
-      <div class="section-title">Environmental indicators</div>
-
-      <div class="kpis">
-
-        <div class="kpi">
-          <div class="name">Mapped buildings</div>
-          <div class="value" id="kBuildings">0</div>
-          <div class="unit">Features</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Road network</div>
-          <div class="value" id="kRoads">0.00</div>
-          <div class="unit">Kilometres</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Green-space area</div>
-          <div class="value" id="kGreen">0.00</div>
-          <div class="unit">Square kilometres</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Water area</div>
-          <div class="value" id="kWater">0.00</div>
-          <div class="unit">Square kilometres</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Industrial features</div>
-          <div class="value" id="kIndustry">0</div>
-          <div class="unit">Features</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Uploaded vector features</div>
-          <div class="value" id="kEnvironmental">0</div>
-          <div class="unit">Features</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">CSV observations</div>
-          <div class="value" id="kCSV">0</div>
-          <div class="unit">Points</div>
-        </div>
-
-        <div class="kpi">
-          <div class="name">Total displayed features</div>
-          <div class="value" id="kTotal">0</div>
-          <div class="unit">Features</div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Spatial distribution</div>
-
-      <div class="chart-box">
-        <div class="chart-title">Environmental feature composition</div>
-        <canvas id="compositionChart"></canvas>
-      </div>
-
-      <div class="chart-box">
-        <div class="chart-title">Feature counts by category</div>
-        <canvas id="countChart"></canvas>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Uploaded environmental attributes</div>
-
-      <div class="chart-box">
-        <div class="chart-title">Numeric attribute distribution</div>
-        <canvas id="attributeChart"></canvas>
-        <div class="small" id="attributeNote">
-          Upload vector data with numeric attributes to populate this chart.
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Raster information</div>
-
-      <div class="kpi">
-        <div class="name">Raster status</div>
-        <div class="value" style="font-size:15px" id="rasterStatus">NOT LOADED</div>
-        <div class="unit" id="rasterDetails">Upload GeoTIFF to visualize raster data.</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Data summary</div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Dataset</th>
-            <th>Features</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="dataTable"></tbody>
-      </table>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Interpretation</div>
-      <div class="message" id="interpretation">
-        Upload or retrieve spatial datasets to begin environmental analysis.
-      </div>
-    </div>
-
-    <footer>
-      <strong>GAMBIA BUREAU OF STATISTICS (GBoS)</strong><br>
-      GIS / CARTOGRAPHY UNIT<br>
-      Produced by Ansu Singhateh<br>
-      GBoS GEOAI • Research and educational use
-    </footer>
-
+  <div class="section">
+   <div class="section-title">Spatial distribution</div>
+   <div class="chart-box">
+    <div class="chart-title">Environmental feature composition</div>
+    <canvas id="compositionChart"></canvas>
+   </div>
+   <div class="chart-box">
+    <div class="chart-title">Feature counts by category</div>
+    <canvas id="countChart"></canvas>
+   </div>
   </div>
+
+  <div class="section">
+   <div class="section-title">Uploaded environmental attributes</div>
+   <div class="chart-box">
+    <div class="chart-title">Numeric attribute distribution</div>
+    <canvas id="attributeChart"></canvas>
+    <div class="small" id="attributeNote">Upload vector data with numeric attributes to populate this chart.</div>
+   </div>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Raster information</div>
+   <div class="kpi">
+    <div class="name">Raster status</div>
+    <div class="value" style="font-size:15px" id="rasterStatus">NOT LOADED</div>
+    <div class="unit" id="rasterDetails">Upload GeoTIFF to visualize raster data.</div>
+   </div>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Data summary</div>
+   <table>
+    <thead><tr><th>Dataset</th><th>Features</th><th>Status</th></tr></thead>
+    <tbody id="dataTable">
+     <tr><td>Administrative</td><td>0</td><td>Pending</td></tr>
+     <tr><td>Environmental</td><td>0</td><td>Pending</td></tr>
+     <tr><td>OpenStreetMap</td><td>0</td><td>Pending</td></tr>
+     <tr><td>CSV points</td><td>0</td><td>Pending</td></tr>
+    </tbody>
+   </table>
+  </div>
+
+  <div class="section">
+   <div class="section-title">Interpretation</div>
+   <div class="message" id="interpretation">
+    Upload or retrieve spatial datasets to begin environmental analysis. All calculated areas and lengths will use geodesic measurements where supported.
+   </div>
+  </div>
+
+  <footer>
+   <strong>GAMBIA BUREAU OF STATISTICS (GBoS)</strong><br>
+   GIS / CARTOGRAPHY UNIT<br>
+   Produced by Ansu Singhateh<br>
+   GBoS GEOAI • Research and educational use
+  </footer>
+ </div>
 </section>
 
 </main>
-
 
 <script>
 "use strict";
@@ -670,2743 +431,902 @@ footer{
 const GAMBIA_CENTER = [13.45, -15.45];
 
 const map = L.map("map", {
-  center: GAMBIA_CENTER,
-  zoom: 8,
-  zoomControl: true,
-  preferCanvas: true
+ center: GAMBIA_CENTER,
+ zoom: 8,
+ zoomControl: true,
+ preferCanvas: true
 });
 
 const baseLayers = {
-
-  street: L.tileLayer(
-    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom:19,
-      attribution:"© OpenStreetMap contributors"
-    }
+ street: L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19,attribution:"© OpenStreetMap contributors"}
+ ),
+ satellite: L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19,attribution:"© Esri"}
+ ),
+ hybrid: L.layerGroup([
+  L.tileLayer(
+   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+   {maxZoom:19,attribution:"© Esri"}
   ),
-
-  satellite: L.tileLayer(
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    {
-      maxZoom:19,
-      attribution:"© Esri"
-    }
-  ),
-
-  hybrid: L.layerGroup([
-    L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      {maxZoom:19}
-    ),
-    L.tileLayer(
-      "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-      {maxZoom:19}
-    )
-  ]),
-
-  terrain: L.tileLayer(
-    "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom:17,
-      attribution:"© OpenTopoMap"
-    }
+  L.tileLayer(
+   "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+   {maxZoom:19,opacity:.9}
   )
+ ]),
+ terrain: L.tileLayer(
+  "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+  {maxZoom:17,attribution:"© OpenTopoMap"}
+ )
 };
 
 let currentBasemap = "street";
 baseLayers.street.addTo(map);
 
-document.getElementById("basemap").addEventListener("change", e => {
-
-  Object.values(baseLayers).forEach(layer => {
-    if(map.hasLayer(layer)) map.removeLayer(layer);
-  });
-
-  currentBasemap = e.target.value;
-  baseLayers[currentBasemap].addTo(map);
-
+document.getElementById("basemap").addEventListener("change",e=>{
+ Object.values(baseLayers).forEach(layer=>{
+  if(map.hasLayer(layer)) map.removeLayer(layer);
+ });
+ currentBasemap=e.target.value;
+ baseLayers[currentBasemap].addTo(map);
 });
 
-
-/* =========================================================
-   2. MAP GROUPS AND APPLICATION STATE
-========================================================= */
-
 const groups = {
-
-  admin:L.geoJSON(null,{
-    style:{
-      color:"#ffffff",
-      weight:1.4,
-      fillColor:"#3b82f6",
-      fillOpacity:.035
-    }
-  }),
-
-  buildings:L.geoJSON(null,{
-    style:{
-      color:"#4e9fff",
-      weight:.5,
-      fillColor:"#4e9fff",
-      fillOpacity:.55
-    }
-  }),
-
-  roads:L.geoJSON(null,{
-    style:{
-      color:"#f4a340",
-      weight:2
-    }
-  }),
-
-  green:L.geoJSON(null,{
-    style:{
-      color:"#31c48d",
-      weight:1,
-      fillColor:"#31c48d",
-      fillOpacity:.35
-    }
-  }),
-
-  water:L.geoJSON(null,{
-    style:{
-      color:"#49d5d0",
-      weight:1,
-      fillColor:"#49d5d0",
-      fillOpacity:.45
-    }
-  }),
-
-  industry:L.geoJSON(null,{
-    style:{
-      color:"#ad91ff",
-      weight:1,
-      fillColor:"#ad91ff",
-      fillOpacity:.4
-    }
-  }),
-
-  environmental:L.geoJSON(null,{
-    style:{
-      color:"#ffca68",
-      weight:1,
-      fillColor:"#ffca68",
-      fillOpacity:.35
-    }
-  }),
-
-  csv:L.layerGroup(),
-  raster:L.layerGroup()
+ admin:L.geoJSON(null,{style:{
+  color:"#ffffff",weight:1.4,fillColor:"#3b82f6",fillOpacity:.035
+ }}),
+ buildings:L.geoJSON(null,{style:{
+  color:"#4e9fff",weight:.5,fillColor:"#4e9fff",fillOpacity:.55
+ }}),
+ roads:L.geoJSON(null,{style:{
+  color:"#f4a340",weight:2
+ }}),
+ green:L.geoJSON(null,{style:{
+  color:"#31c48d",weight:1,fillColor:"#31c48d",fillOpacity:.35
+ }}),
+ water:L.geoJSON(null,{style:{
+  color:"#49d5d0",weight:1,fillColor:"#49d5d0",fillOpacity:.45
+ }}),
+ industry:L.geoJSON(null,{style:{
+  color:"#ad91ff",weight:1,fillColor:"#ad91ff",fillOpacity:.4
+ }}),
+ environmental:L.geoJSON(null,{style:{
+  color:"#ffca68",weight:1,fillColor:"#ffca68",fillOpacity:.35
+ }}),
+ csv:L.layerGroup(),
+ raster:L.layerGroup()
 };
 
-Object.values(groups).forEach(g => g.addTo(map));
+function addGroup(name){
+ if(!map.hasLayer(groups[name])) groups[name].addTo(map);
+}
+Object.keys(groups).forEach(addGroup);
 
-
-const state = {
-
-  admin:null,
-  adminFeatures:[],
-
-  environmental:[],
-
-  osm:{
-    buildings:[],
-    roads:[],
-    green:[],
-    water:[],
-    industry:[]
-  },
-
-  csvFeatures:[],
-  csvCount:0,
-
-  rasterLayer:null,
-  raster:null,
-
-  charts:{},
-
-  filteredAdmin:[]
-
+const state={
+ admin:null,
+ adminFeatures:[],
+ environmental:[],
+ osm:{buildings:[],roads:[],green:[],water:[],industry:[]},
+ csvCount:0,
+ rasterLayer:null,
+ raster:null,
+ charts:{},
+ filteredAdmin:[]
 };
-
-
-// FILTERED DATA: ALL ANALYTICS USE THESE ARRAYS.
-
-let filteredData = {
-
-  buildings:[],
-  roads:[],
-  green:[],
-  water:[],
-  industry:[],
-  environmental:[],
-  csv:[]
-
-};
-
-
-let adminFields = {
-  region:null,
-  district:null,
-  ward:null
-};
-
 
 function setNotice(message){
-  document.getElementById("notice").textContent = message;
+ document.getElementById("notice").textContent=message;
 }
 
 function safeText(v){
-  return v===null || v===undefined ? "" : String(v).trim();
+ return v===null||v===undefined?"":String(v).trim();
 }
 
 function featuresOf(data){
-
-  if(data.type==="FeatureCollection") return data.features || [];
-
-  if(data.type==="Feature") return [data];
-
-  return [];
-
+ if(data.type==="FeatureCollection") return data.features||[];
+ if(data.type==="Feature") return [data];
+ return [];
 }
 
 function normalizeName(v){
-
-  return safeText(v)
-    .toLowerCase()
-    .replace(/[_-]/g," ")
-    .trim();
-
+ return safeText(v).toLowerCase().replace(/[_-]/g," ").trim();
 }
 
 function propertyKey(properties,candidates){
-
-  const keys = Object.keys(properties || {});
-
-  for(const candidate of candidates){
-
-    const match = keys.find(
-      k => normalizeName(k)===normalizeName(candidate)
-    );
-
-    if(match) return match;
-
-  }
-
-  return null;
-
+ const keys=Object.keys(properties||{});
+ for(const candidate of candidates){
+  const match=keys.find(k=>normalizeName(k)===normalizeName(candidate));
+  if(match) return match;
+ }
+ return null;
 }
 
-
-/* =========================================================
-   3. ADMINISTRATIVE FIELD DETECTION
-========================================================= */
-
-const fieldCandidates = {
-
-  region:[
-    "region",
-    "regionname",
-    "rco",
-    "admin1",
-    "admin_1"
-  ],
-
-  district:[
-    "district",
-    "districtname",
-    "distname",
-    "lganame",
-    "admin2",
-    "admin_2"
-  ],
-
-  ward:[
-    "ward",
-    "wardname",
-    "admin3",
-    "admin_3"
-  ]
-
+const fieldCandidates={
+ region:["region","regionname","rco","admin1","admin_1","lganame"],
+ district:["district","districtname","distname","admin2","admin_2"],
+ ward:["ward","wardname","admin3","admin_3"]
 };
 
-
 function detectAdminFields(feature){
-
-  const p = feature?.properties || {};
-
-  return {
-
-    region:propertyKey(p,fieldCandidates.region),
-
-    district:propertyKey(p,fieldCandidates.district),
-
-    ward:propertyKey(p,fieldCandidates.ward)
-
-  };
-
+ const p=feature?.properties||{};
+ return {
+  region:propertyKey(p,fieldCandidates.region),
+  district:propertyKey(p,fieldCandidates.district),
+  ward:propertyKey(p,fieldCandidates.ward)
+ };
 }
 
+let adminFields={region:null,district:null,ward:null};
 
 function uniqueValues(features,key){
-
-  if(!key) return [];
-
-  return [
-    ...new Set(
-      features
-        .map(f => safeText(f.properties?.[key]))
-        .filter(Boolean)
-    )
-  ].sort((a,b)=>a.localeCompare(b));
-
+ if(!key)return [];
+ return [...new Set(features.map(f=>safeText(f.properties?.[key])).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b));
 }
-
 
 function populateSelect(id,values,placeholder){
-
-  const el = document.getElementById(id);
-  const previous = el.value;
-
-  el.innerHTML = "";
-
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = placeholder;
-
-  el.appendChild(first);
-
-  values.forEach(value => {
-
-    const opt = document.createElement("option");
-
-    opt.value = value;
-    opt.textContent = value;
-
-    el.appendChild(opt);
-
-  });
-
-  if(values.includes(previous)) el.value = previous;
-
+ const el=document.getElementById(id);
+ const previous=el.value;
+ el.innerHTML="";
+ const first=document.createElement("option");
+ first.value="";
+ first.textContent=placeholder;
+ el.appendChild(first);
+ values.forEach(value=>{
+  const opt=document.createElement("option");
+  opt.value=value;
+  opt.textContent=value;
+  el.appendChild(opt);
+ });
+ if(values.includes(previous))el.value=previous;
 }
-
 
 function updateAdminSelectors(){
-
-  populateSelect(
-    "region",
-    uniqueValues(state.adminFeatures,adminFields.region),
-    "All regions"
-  );
-
-  updateDependentSelectors();
-
+ const fs=state.adminFeatures;
+ populateSelect("region",uniqueValues(fs,adminFields.region),"All regions");
+ populateSelect("district",[],"All districts");
+ populateSelect("ward",[],"All wards");
+ updateDependentSelectors();
 }
-
 
 function updateDependentSelectors(){
+ const r=document.getElementById("region").value;
+ const d=document.getElementById("district").value;
 
-  const r = document.getElementById("region").value;
-  const d = document.getElementById("district").value;
+ let subset=state.adminFeatures;
+ if(r&&adminFields.region){
+  subset=subset.filter(f=>safeText(f.properties?.[adminFields.region])===r);
+ }
+ populateSelect("district",uniqueValues(subset,adminFields.district),"All districts");
 
-  let subset = state.adminFeatures;
-
-  if(r && adminFields.region){
-
-    subset = subset.filter(
-      f => safeText(f.properties?.[adminFields.region])===r
-    );
-
-  }
-
-  populateSelect(
-    "district",
-    uniqueValues(subset,adminFields.district),
-    "All districts"
-  );
-
-  if(d && adminFields.district){
-
-    subset = subset.filter(
-      f => safeText(f.properties?.[adminFields.district])===d
-    );
-
-  }
-
-  populateSelect(
-    "ward",
-    uniqueValues(subset,adminFields.ward),
-    "All wards"
-  );
-
+ if(d&&adminFields.district){
+  subset=subset.filter(f=>safeText(f.properties?.[adminFields.district])===d);
+ }
+ populateSelect("ward",uniqueValues(subset,adminFields.ward),"All wards");
 }
-
 
 function selectedAdminFeatures(){
+ let fs=state.adminFeatures;
+ const r=document.getElementById("region").value;
+ const d=document.getElementById("district").value;
+ const w=document.getElementById("ward").value;
 
-  let fs = state.adminFeatures;
+ if(r&&adminFields.region)
+  fs=fs.filter(f=>safeText(f.properties?.[adminFields.region])===r);
+ if(d&&adminFields.district)
+  fs=fs.filter(f=>safeText(f.properties?.[adminFields.district])===d);
+ if(w&&adminFields.ward)
+  fs=fs.filter(f=>safeText(f.properties?.[adminFields.ward])===w);
 
-  const r = document.getElementById("region").value;
-  const d = document.getElementById("district").value;
-  const w = document.getElementById("ward").value;
-
-  if(r && adminFields.region){
-
-    fs = fs.filter(
-      f => safeText(f.properties?.[adminFields.region])===r
-    );
-
-  }
-
-  if(d && adminFields.district){
-
-    fs = fs.filter(
-      f => safeText(f.properties?.[adminFields.district])===d
-    );
-
-  }
-
-  if(w && adminFields.ward){
-
-    fs = fs.filter(
-      f => safeText(f.properties?.[adminFields.ward])===w
-    );
-
-  }
-
-  return fs;
-
+ return fs;
 }
-
-
-/* =========================================================
-   4. SELECTED AREA GEOMETRY
-========================================================= */
-
-// Creates a MultiPolygon representing the complete AOI.
-// No selection means national analysis.
-
-function getSelectedAOI(){
-
-  const features = selectedAdminFeatures().filter(f =>
-    f.geometry &&
-    ["Polygon","MultiPolygon"].includes(f.geometry.type)
-  );
-
-  if(!features.length) return null;
-
-  const coordinates = [];
-
-  features.forEach(f => {
-
-    if(f.geometry.type==="Polygon"){
-
-      coordinates.push(f.geometry.coordinates);
-
-    }else{
-
-      coordinates.push(...f.geometry.coordinates);
-
-    }
-
-  });
-
-  if(!coordinates.length) return null;
-
-  return turf.multiPolygon(coordinates);
-
-}
-
-
-function insideAOI(point,aoi){
-
-  try{
-
-    return turf.booleanPointInPolygon(point,aoi);
-
-  }catch(e){
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   5. PRECISE SPATIAL CLIPPING ENGINE
-========================================================= */
-
-// Polygon and MultiPolygon intersections are calculated
-// using Turf.js. Lines are split at AOI boundaries.
-// Points outside the AOI are removed.
-
-function clipFeatureToAOI(feature,aoi){
-
-  if(!feature || !feature.geometry || !aoi) return [];
-
-  try{
-
-    const type = feature.geometry.type;
-
-    // POINTS
-
-    if(type==="Point"){
-
-      return insideAOI(feature,aoi) ? [feature] : [];
-
-    }
-
-
-    // MULTIPOINTS
-
-    if(type==="MultiPoint"){
-
-      const points = feature.geometry.coordinates.filter(c =>
-
-        insideAOI(turf.point(c),aoi)
-
-      );
-
-      return points.length ? [{
-        ...feature,
-        geometry:{
-          type:"MultiPoint",
-          coordinates:points
-        }
-      }] : [];
-
-    }
-
-
-    // POLYGONS: ACTUAL GEOMETRY INTERSECTION
-
-    if(type==="Polygon" || type==="MultiPolygon"){
-
-      const result = turf.intersect(
-        turf.featureCollection([feature,aoi])
-      );
-
-      if(!result) return [];
-
-      return [{
-        ...result,
-        properties:{...(feature.properties || {})}
-      }];
-
-    }
-
-
-    // LINESTRING / MULTILINESTRING
-    // Split against individual AOI boundary lines.
-
-    if(type==="LineString" || type==="MultiLineString"){
-
-      const inputLines = type==="LineString"
-        ? [feature.geometry.coordinates]
-        : feature.geometry.coordinates;
-
-      const output = [];
-
-      const boundary = turf.polygonToLine(aoi);
-
-      const boundaryLines = [];
-
-      turf.flattenEach(boundary, f => {
-
-        if(f.geometry.type==="LineString"){
-
-          boundaryLines.push(f);
-
-        }
-
-      });
-
-      inputLines.forEach(coords => {
-
-        if(!coords || coords.length<2) return;
-
-        let segments = [turf.lineString(coords)];
-
-        boundaryLines.forEach(boundaryLine => {
-
-          const nextSegments = [];
-
-          segments.forEach(segment => {
-
-            try{
-
-              const split = turf.lineSplit(segment,boundaryLine);
-
-              split.features.forEach(f => {
-
-                if(f.geometry.coordinates.length>=2){
-
-                  nextSegments.push(f);
-
-                }
-
-              });
-
-            }catch(e){
-
-              nextSegments.push(segment);
-
-            }
-
-          });
-
-          segments = nextSegments;
-
-        });
-
-
-        segments.forEach(segment => {
-
-          try{
-
-            const midpoint = turf.along(
-              segment,
-              turf.length(segment,{units:"kilometers"})/2,
-              {units:"kilometers"}
-            );
-
-            if(insideAOI(midpoint,aoi)){
-
-              output.push({
-
-                ...segment,
-
-                properties:{
-                  ...(feature.properties || {})
-                }
-
-              });
-
-            }
-
-          }catch(e){}
-
-        });
-
-      });
-
-      return output;
-
-    }
-
-  }catch(e){
-
-    console.warn("AOI clipping error:",e);
-
-  }
-
-  return [];
-
-}
-
-
-function filterFeaturesToAOI(features,aoi){
-
-  if(!aoi) return features.slice();
-
-  const output = [];
-
-  features.forEach(feature => {
-
-    const clipped = clipFeatureToAOI(feature,aoi);
-
-    output.push(...clipped);
-
-  });
-
-  return output;
-
-}
-
-
-/* =========================================================
-   6. SPATIAL FILTERING AND MAP REFRESH
-========================================================= */
-
-function refreshSpatialLayers(){
-
-  const aoi = getSelectedAOI();
-
-  const source = {
-
-    buildings:state.osm.buildings,
-    roads:state.osm.roads,
-    green:state.osm.green,
-    water:state.osm.water,
-    industry:state.osm.industry,
-    environmental:state.environmental
-
-  };
-
-
-  // Filter every vector dataset.
-
-  Object.keys(source).forEach(key => {
-
-    filteredData[key] = filterFeaturesToAOI(
-      source[key],
-      aoi
-    );
-
-  });
-
-
-  // Rebuild all filtered map layers.
-
-  [
-    "buildings",
-    "roads",
-    "green",
-    "water",
-    "industry",
-    "environmental"
-  ].forEach(key => {
-
-    groups[key].clearLayers();
-
-    if(filteredData[key].length){
-
-      groups[key].addData({
-
-        type:"FeatureCollection",
-
-        features:filteredData[key]
-
-      });
-
-    }
-
-  });
-
-
-  // CSV POINT FILTERING.
-
-  filteredData.csv = state.csvFeatures.filter(f =>
-
-    !aoi || insideAOI(f,aoi)
-
-  );
-
-  groups.csv.clearLayers();
-
-  filteredData.csv.forEach(f => {
-
-    const coords = f.geometry.coordinates;
-
-    L.circleMarker(
-      [coords[1],coords[0]],
-      {
-        radius:5,
-        color:"#f4a340",
-        fillColor:"#f4a340",
-        fillOpacity:.85
-      }
-    ).bindPopup(
-      "<b>CSV observation</b><br>" +
-      Object.entries(f.properties || {})
-        .slice(0,12)
-        .map(([k,v]) =>
-          "<br>" + escapeHTML(k) + ": " + escapeHTML(v)
-        ).join("")
-    ).addTo(groups.csv);
-
-  });
-
-
-  // Raster handling:
-  // The uploaded raster is hidden while an AOI is selected.
-  // It is not displayed as if it had been clipped.
-
-  if(state.rasterLayer){
-
-    groups.raster.removeLayer(state.rasterLayer);
-
-    if(!aoi){
-
-      if(document.getElementById("showRaster").checked){
-
-        state.rasterLayer.addTo(groups.raster);
-
-      }
-
-      document.getElementById("rasterDetails").textContent =
-        "National raster display. No AOI mask applied.";
-
-    }else{
-
-      document.getElementById("rasterDetails").textContent =
-        "Raster hidden for AOI analysis. A clipped GeoTIFF is required for selected-area display.";
-
-    }
-
-  }
-
-
-  applyVisibility();
-
-  updateAnalytics();
-
-  updateDataTable();
-
-
-  document.getElementById("mapStatus").textContent =
-
-    aoi
-      ? "SELECTED AOI • " + filteredData.environmental.length +
-        " UPLOADED FEATURES"
-      : "GAMBIA NATIONAL VIEW";
-
-}
-
-
-/* =========================================================
-   7. ADMINISTRATIVE MAP DISPLAY AND ZOOM
-========================================================= */
 
 function refreshAdmin(){
-
-  groups.admin.clearLayers();
-
-  const fs = selectedAdminFeatures();
-
-  state.filteredAdmin = fs;
-
-  if(fs.length){
-
-    groups.admin.addData({
-
-      type:"FeatureCollection",
-
-      features:fs
-
-    });
-
-  }
-
-  applyVisibility();
-
+ groups.admin.clearLayers();
+ const fs=selectedAdminFeatures();
+ state.filteredAdmin=fs;
+ if(fs.length)groups.admin.addData({type:"FeatureCollection",features:fs});
+ applyVisibility();
+ updateAnalytics();
+ document.getElementById("mapStatus").textContent=
+  fs.length?"ADMINISTRATIVE FEATURES: "+fs.length:"GAMBIA NATIONAL VIEW";
 }
 
+["region","district","ward"].forEach(id=>{
+ document.getElementById(id).addEventListener("change",()=>{
+  if(id==="region"){
+   document.getElementById("district").value="";
+   document.getElementById("ward").value="";
+  }
+  if(id==="district")document.getElementById("ward").value="";
+  updateDependentSelectors();
+  refreshAdmin();
+  zoomToSelection();
+ });
+});
 
 function zoomToSelection(){
-
-  const features = selectedAdminFeatures();
-
-  if(!features.length){
-
-    map.setView(GAMBIA_CENTER,8);
-
-    return;
-
-  }
-
-  try{
-
-    const layer = L.geoJSON({
-
-      type:"FeatureCollection",
-
-      features
-
-    });
-
-    const bounds = layer.getBounds();
-
-    if(bounds.isValid()){
-
-      map.fitBounds(bounds,{
-        padding:[30,30],
-        maxZoom:15
-      });
-
-    }
-
-  }catch(e){
-
-    console.warn(e);
-
-  }
-
+ const features=selectedAdminFeatures();
+ if(!features.length){
+  map.setView(GAMBIA_CENTER,8);
+  return;
+ }
+ try{
+  const layer=L.geoJSON({type:"FeatureCollection",features});
+  const bounds=layer.getBounds();
+  if(bounds.isValid())map.fitBounds(bounds,{padding:[25,25],maxZoom:14});
+ }catch(e){console.warn(e)}
 }
 
-
-["region","district","ward"].forEach(id => {
-
-  document.getElementById(id).addEventListener("change",()=>{
-
-    if(id==="region"){
-
-      document.getElementById("district").value="";
-      document.getElementById("ward").value="";
-
-    }
-
-    if(id==="district"){
-
-      document.getElementById("ward").value="";
-
-    }
-
-    updateDependentSelectors();
-
-    refreshAdmin();
-
-    refreshSpatialLayers();
-
-    zoomToSelection();
-
-    const aoi = getSelectedAOI();
-
-    setNotice(
-      aoi
-        ? "Selected-area filtering applied. Outside features excluded."
-        : "National spatial view activated."
-    );
-
-  });
-
-});
-
-
-document.getElementById("zoomSelected").addEventListener(
-  "click",
-  zoomToSelection
-);
-
-
-document.getElementById("clearSelection").addEventListener("click",()=>{
-
-  ["region","district","ward"].forEach(id => {
-
-    document.getElementById(id).value="";
-
-  });
-
-  updateDependentSelectors();
-
-  refreshAdmin();
-
-  refreshSpatialLayers();
-
-  map.setView(GAMBIA_CENTER,8);
-
-  setNotice("Administrative selection cleared. National view restored.");
-
-});
-
+document.getElementById("zoomSelected").addEventListener("click",zoomToSelection);
 
 /* =========================================================
-   8. FILE UPLOADS
+   2. FILE UPLOADS
 ========================================================= */
 
 async function readVectorFile(file){
-
-  const name = file.name.toLowerCase();
-
-  if(name.endsWith(".zip")){
-
-    const result = await shp(file);
-
-    if(result.type==="FeatureCollection") return result;
-
-    const collections = Object.values(result).filter(
-      x => x?.type==="FeatureCollection"
-    );
-
-    if(!collections.length){
-
-      throw new Error("No valid Shapefile layer found in ZIP.");
-
-    }
-
-    return {
-
-      type:"FeatureCollection",
-
-      features:collections.flatMap(x=>x.features || [])
-
-    };
-
-  }
-
-  const content = await file.text();
-
-  const data = JSON.parse(content);
-
-  if(!["FeatureCollection","Feature"].includes(data.type)){
-
-    throw new Error("File is not a valid GeoJSON Feature or FeatureCollection.");
-
-  }
-
-  return data;
-
-}
-
-
-/* ADMINISTRATIVE BOUNDARIES */
-
-document.getElementById("adminFile").addEventListener(
-  "change",
-  async e => {
-
-    const file = e.target.files[0];
-
-    if(!file) return;
-
-    try{
-
-      const data = await readVectorFile(file);
-
-      const features = featuresOf(data);
-
-      if(!features.length){
-
-        throw new Error("No features found.");
-
-      }
-
-      state.admin = data;
-
-      state.adminFeatures = features;
-
-      adminFields = detectAdminFields(features[0]);
-
-      if(!adminFields.region &&
-         !adminFields.district &&
-         !adminFields.ward){
-
-        throw new Error(
-          "Administrative fields not detected. Expected fields such as RCO, lganame, distname and wardname."
-        );
-
-      }
-
-      ["region","district","ward"].forEach(id => {
-
-        document.getElementById(id).value="";
-
-      });
-
-      updateAdminSelectors();
-
-      refreshAdmin();
-
-      refreshSpatialLayers();
-
-      zoomToSelection();
-
-      updateDataTable();
-
-      setNotice(
-        "Administrative data loaded: " +
-        features.length +
-        " features. Spatial filtering activated."
-      );
-
-    }catch(err){
-
-      alert("Administrative upload failed: " + err.message);
-
-    }
-
-  }
-);
-
-
-/* ENVIRONMENTAL VECTOR DATA */
-
-document.getElementById("vectorFile").addEventListener(
-  "change",
-  async e => {
-
-    const file = e.target.files[0];
-
-    if(!file) return;
-
-    try{
-
-      const data = await readVectorFile(file);
-
-      const fs = featuresOf(data);
-
-      if(!fs.length){
-
-        throw new Error("No vector features found.");
-
-      }
-
-      state.environmental = fs;
-
-      refreshSpatialLayers();
-
-      updateDataTable();
-
-      setNotice(
-        "Environmental vector loaded: " +
-        fs.length +
-        " source features. Selected-area filtering applied."
-      );
-
-    }catch(err){
-
-      alert("Vector upload failed: " + err.message);
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   9. CSV IMPORT
-========================================================= */
-
-function parseCSV(text){
-
-  const lines = text
-    .replace(/^\uFEFF/,"")
-    .split(/\r?\n/)
-    .filter(x=>x.trim());
-
-  if(lines.length<2) return [];
-
-  const parseLine = line => {
-
-    const out = [];
-
-    let value = "";
-    let quoted = false;
-
-    for(let i=0;i<line.length;i++){
-
-      const c = line[i];
-
-      if(c==='"' && line[i+1]==='"'){
-
-        value+='"';
-        i++;
-
-      }else if(c==='"'){
-
-        quoted=!quoted;
-
-      }else if(c==="," && !quoted){
-
-        out.push(value.trim());
-        value="";
-
-      }else{
-
-        value+=c;
-
-      }
-
-    }
-
-    out.push(value.trim());
-
-    return out;
-
+ const name=file.name.toLowerCase();
+ if(name.endsWith(".zip")){
+  const result=await shp(file);
+  if(result.type==="FeatureCollection")return result;
+  const collections=Object.values(result).filter(x=>x?.type==="FeatureCollection");
+  if(!collections.length)throw new Error("No valid Shapefile layer found in ZIP.");
+  return {
+   type:"FeatureCollection",
+   features:collections.flatMap(x=>x.features||[])
   };
-
-  const headers = parseLine(lines[0]).map(
-    x=>x.toLowerCase().trim()
-  );
-
-  return lines.slice(1).map(line=>{
-
-    const values = parseLine(line);
-
-    return Object.fromEntries(
-
-      headers.map((h,i)=>[h,values[i] ?? ""])
-
-    );
-
-  });
-
+ }
+ const text=await file.text();
+ const data=JSON.parse(text);
+ if(!["FeatureCollection","Feature"].includes(data.type))
+  throw new Error("File is not a GeoJSON Feature or FeatureCollection.");
+ return data;
 }
 
+document.getElementById("adminFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ try{
+  const data=await readVectorFile(file);
+  state.admin=data;
+  state.adminFeatures=featuresOf(data);
+  if(!state.adminFeatures.length)throw new Error("No features found.");
+  adminFields=detectAdminFields(state.adminFeatures[0]);
+  groups.admin.clearLayers();
+  updateAdminSelectors();
+  refreshAdmin();
+  zoomToSelection();
+  setNotice("Administrative data loaded: "+state.adminFeatures.length+" features.");
+  updateDataTable();
+ }catch(err){
+  alert("Administrative upload failed: "+err.message);
+ }
+});
+
+document.getElementById("vectorFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ try{
+  const data=await readVectorFile(file);
+  const fs=featuresOf(data);
+  state.environmental=fs;
+  groups.environmental.clearLayers();
+  groups.environmental.addData({type:"FeatureCollection",features:fs});
+  applyVisibility();
+  updateAnalytics();
+  updateDataTable();
+  setNotice("Environmental vector loaded: "+fs.length+" features.");
+ }catch(err){
+  alert("Vector upload failed: "+err.message);
+ }
+});
+
+/* CSV coordinates */
+function parseCSV(text){
+ const lines=text.replace(/^\uFEFF/,"").split(/\r?\n/).filter(x=>x.trim());
+ if(lines.length<2)return [];
+ const parseLine=line=>{
+  const out=[];let value="",quoted=false;
+  for(let i=0;i<line.length;i++){
+   const c=line[i];
+   if(c==='"'&&line[i+1]==='"'){value+='"';i++;}
+   else if(c==='"')quoted=!quoted;
+   else if(c===","&&!quoted){out.push(value.trim());value="";}
+   else value+=c;
+  }
+  out.push(value.trim());
+  return out;
+ };
+ const headers=parseLine(lines[0]).map(x=>x.toLowerCase().trim());
+ return lines.slice(1).map(line=>{
+  const values=parseLine(line);
+  return Object.fromEntries(headers.map((h,i)=>[h,values[i]??""]));
+ });
+}
 
 function findCoord(row,candidates){
-
-  for(const c of candidates){
-
-    if(row[c]!==undefined && row[c]!==""){
-
-      return Number(row[c]);
-
-    }
-
-  }
-
-  return NaN;
-
+ for(const c of candidates){
+  if(row[c]!==undefined&&row[c]!=="")return Number(row[c]);
+ }
+ return NaN;
 }
 
-
-document.getElementById("csvFile").addEventListener(
-  "change",
-  async e => {
-
-    const file = e.target.files[0];
-
-    if(!file) return;
-
-    try{
-
-      const rows = parseCSV(await file.text());
-
-      state.csvFeatures = [];
-
-      rows.forEach(row=>{
-
-        const lat = findCoord(row,[
-          "latitude","lat","y"
-        ]);
-
-        const lon = findCoord(row,[
-          "longitude","lon","lng","long","x"
-        ]);
-
-        if(
-          !Number.isFinite(lat) ||
-          !Number.isFinite(lon) ||
-          Math.abs(lat)>90 ||
-          Math.abs(lon)>180
-        ) return;
-
-        state.csvFeatures.push({
-
-          type:"Feature",
-
-          properties:row,
-
-          geometry:{
-            type:"Point",
-            coordinates:[lon,lat]
-          }
-
-        });
-
-      });
-
-      state.csvCount = state.csvFeatures.length;
-
-      refreshSpatialLayers();
-
-      updateDataTable();
-
-      setNotice(
-        "CSV imported: " +
-        state.csvCount +
-        " valid coordinate records. Only selected-area points displayed."
-      );
-
-    }catch(err){
-
-      alert("CSV import failed: " + err.message);
-
-    }
-
+document.getElementById("csvFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ try{
+  const rows=parseCSV(await file.text());
+  groups.csv.clearLayers();
+  let count=0;
+  rows.forEach(row=>{
+   const lat=findCoord(row,["latitude","lat","y"]);
+   const lon=findCoord(row,["longitude","lon","lng","long","x"]);
+   if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return;
+   const marker=L.circleMarker([lat,lon],{
+    radius:5,color:"#f4a340",fillColor:"#f4a340",fillOpacity:.85
+   });
+   marker.bindPopup("<b>CSV observation</b><br>"+Object.entries(row)
+    .slice(0,12).map(([k,v])=>"<br>"+escapeHTML(k)+": "+escapeHTML(v)).join(""));
+   marker.addTo(groups.csv);
+   count++;
+  });
+  state.csvCount=count;
+  updateDataTable();
+  updateAnalytics();
+  if(count){
+   const bounds=groups.csv.getBounds();
+   if(bounds.isValid())map.fitBounds(bounds,{padding:[25,25]});
   }
-);
-
+  setNotice("CSV imported. Valid coordinate records: "+count);
+ }catch(err){alert("CSV import failed: "+err.message)}
+});
 
 function escapeHTML(v){
-
-  return String(v).replace(/[&<>"']/g,c=>({
-
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-
-  }[c]));
-
+ return String(v).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
 }
 
-
 /* =========================================================
-   10. GEOTIFF RASTER SUPPORT
+   3. GEOTIFF RASTER SUPPORT
 ========================================================= */
 
-document.getElementById("rasterFile").addEventListener(
-  "change",
-  async e => {
+document.getElementById("rasterFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ try{
+  if(typeof parseGeoraster!=="function"||typeof GeoRasterLayer==="undefined")
+   throw new Error("Raster libraries did not load. Check your internet connection.");
 
-    const file = e.target.files[0];
+  const arrayBuffer=await file.arrayBuffer();
+  const raster=await parseGeoraster(arrayBuffer);
+  if(state.rasterLayer)groups.raster.removeLayer(state.rasterLayer);
 
-    if(!file) return;
-
-    try{
-
-      if(
-        typeof parseGeoraster!=="function" ||
-        typeof GeoRasterLayer==="undefined"
-      ){
-
-        throw new Error("Raster libraries did not load.");
-
-      }
-
-      const arrayBuffer = await file.arrayBuffer();
-
-      const raster = await parseGeoraster(arrayBuffer);
-
-      if(state.rasterLayer){
-
-        groups.raster.removeLayer(state.rasterLayer);
-
-      }
-
-      state.raster = raster;
-
-      state.rasterLayer = new GeoRasterLayer({
-
-        georaster:raster,
-
-        opacity:.72,
-
-        resolution:256,
-
-        pixelValuesToColorFn:values=>{
-
-          const v = values[0];
-
-          if(v===null || v===undefined || !Number.isFinite(v)){
-
-            return null;
-
-          }
-
-          if(
-            raster.noDataValue!==null &&
-            v===raster.noDataValue
-          ){
-
-            return null;
-
-          }
-
-          const min = raster.mins?.[0] ?? 0;
-
-          const max = raster.maxs?.[0] ?? 1;
-
-          const t = Math.max(
-            0,
-            Math.min(1,(v-min)/(max-min || 1))
-          );
-
-          const r = Math.round(30+220*t);
-          const g = Math.round(160-90*t);
-          const b = Math.round(210-170*t);
-
-          return "rgb("+r+","+g+","+b+")";
-
-        }
-
-      });
-
-      document.getElementById("rasterStatus").textContent="LOADED";
-
-      document.getElementById("rasterDetails").textContent=
-        "Bands: " + raster.numberOfRasters +
-        " | NoData: " + raster.noDataValue;
-
-      // Only show unmasked raster in national view.
-
-      refreshSpatialLayers();
-
-      if(!getSelectedAOI()){
-
-        const bounds = state.rasterLayer.getBounds();
-
-        if(bounds?.isValid()){
-
-          map.fitBounds(bounds,{padding:[20,20]});
-
-        }
-
-      }
-
-      setNotice(
-        "GeoTIFF loaded. Raster is displayed nationally only; it is hidden when an AOI is selected because no raster mask has been applied."
-      );
-
-    }catch(err){
-
-      alert("Raster upload failed: " + err.message);
-
-    }
-
-  }
-);
-
+  state.raster=raster;
+  state.rasterLayer=new GeoRasterLayer({
+   georaster:raster,
+   opacity:.72,
+   resolution:256,
+   pixelValuesToColorFn:values=>{
+    const v=values[0];
+    if(v===null||v===undefined||!Number.isFinite(v))return null;
+    if(raster.noDataValue!==null&&v===raster.noDataValue)return null;
+    // Neutral continuous visualization. Raw raster values remain unchanged.
+    const min=raster.mins?.[0]??0;
+    const max=raster.maxs?.[0]??1;
+    const t=Math.max(0,Math.min(1,(v-min)/(max-min||1)));
+    const r=Math.round(30+220*t);
+    const g=Math.round(160-90*t);
+    const b=Math.round(210-170*t);
+    return "rgb("+r+","+g+","+b+")";
+   }
+  });
+  state.rasterLayer.addTo(groups.raster);
+  const bounds=state.rasterLayer.getBounds();
+  if(bounds?.isValid())map.fitBounds(bounds,{padding:[20,20]});
+  document.getElementById("rasterStatus").textContent="LOADED";
+  document.getElementById("rasterDetails").textContent=
+   "Bands: "+raster.numberOfRasters+" | NoData: "+raster.noDataValue;
+  applyVisibility();
+  setNotice("GeoTIFF loaded. Raster visualization uses a display stretch, not a derived index.");
+ }catch(err){
+  alert("Raster upload failed: "+err.message);
+ }
+});
 
 /* =========================================================
-   11. OPENSTREETMAP FEATURE EXTRACTION
+   4. LIVE OPENSTREETMAP EXTRACTION
 ========================================================= */
 
 function overpassToGeoJSON(data){
-
-  const features = [];
-
-  data.elements.forEach(el=>{
-
-    if(el.type==="node"){
-
-      if(!el.tags || !Object.keys(el.tags).length) return;
-
-      features.push({
-
-        type:"Feature",
-
-        id:el.id,
-
-        properties:el.tags,
-
-        geometry:{
-          type:"Point",
-          coordinates:[el.lon,el.lat]
-        }
-
-      });
-
-    }
-
-
-    if(el.type==="way" && el.geometry){
-
-      const coords = el.geometry.map(
-        p=>[p.lon,p.lat]
-      );
-
-      const closed =
-        coords.length>3 &&
-        coords[0][0]===coords[coords.length-1][0] &&
-        coords[0][1]===coords[coords.length-1][1];
-
-      const tags = el.tags || {};
-
-      const isArea = closed && (
-
-        tags.building ||
-        tags.leisure ||
-        tags.landuse ||
-        tags.natural==="water" ||
-        tags.natural==="wood" ||
-        tags.water
-
-      );
-
-      features.push({
-
-        type:"Feature",
-
-        id:el.id,
-
-        properties:tags,
-
-        geometry:isArea
-          ? {
-              type:"Polygon",
-              coordinates:[coords]
-            }
-          : {
-              type:"LineString",
-              coordinates:coords
-            }
-
-      });
-
-    }
-
-  });
-
-  return {
-
-    type:"FeatureCollection",
-
-    features
-
-  };
-
+ const nodes=new Map();
+ data.elements.forEach(el=>{
+  if(el.type==="node")nodes.set(el.id,[el.lon,el.lat]);
+ });
+ const features=[];
+ data.elements.forEach(el=>{
+  if(el.type==="node"){
+   if(!el.tags||!Object.keys(el.tags).length)return;
+   features.push({
+    type:"Feature",id:el.id,
+    properties:el.tags,
+    geometry:{type:"Point",coordinates:[el.lon,el.lat]}
+   });
+  }
+  if(el.type==="way"&&el.geometry){
+   const coords=el.geometry.map(p=>[p.lon,p.lat]);
+   const closed=coords.length>3&&
+    coords[0][0]===coords[coords.length-1][0]&&
+    coords[0][1]===coords[coords.length-1][1];
+   const tags=el.tags||{};
+   const area=closed&&(
+    tags.leisure||tags.landuse||tags.natural==="water"||
+    tags.water||tags.building
+   );
+   features.push({
+    type:"Feature",id:el.id,properties:tags,
+    geometry:area?
+     {type:"Polygon",coordinates:[coords]}:
+     {type:"LineString",coordinates:coords}
+   });
+  }
+ });
+ return {type:"FeatureCollection",features};
 }
-
 
 function classifyOSM(feature){
-
-  const p = feature.properties || {};
-
-  if(p.building) return "buildings";
-
-  if(p.highway) return "roads";
-
-  if(
-    p.leisure==="park" ||
-    p.leisure==="garden" ||
-    p.landuse==="grass" ||
-    p.landuse==="forest" ||
-    p.natural==="wood" ||
-    p.landuse==="meadow"
-  ) return "green";
-
-  if(
-    p.natural==="water" ||
-    p.water ||
-    p.waterway ||
-    p.landuse==="reservoir" ||
-    p.landuse==="basin"
-  ) return "water";
-
-  if(
-    p.landuse==="industrial" ||
-    p.industrial ||
-    p.commercial ||
-    p.landuse==="commercial"
-  ) return "industry";
-
-  return null;
-
+ const p=feature.properties||{};
+ if(p.building)return "buildings";
+ if(p.highway)return "roads";
+ if(p.leisure==="park"||p.leisure==="garden"||p.landuse==="grass"||
+    p.landuse==="forest"||p.natural==="wood"||p.landuse==="meadow")return "green";
+ if(p.natural==="water"||p.water||p.waterway||p.landuse==="reservoir"||
+    p.landuse==="basin")return "water";
+ if(p.landuse==="industrial"||p.industrial||p.commercial||
+    p.landuse==="commercial")return "industry";
+ return null;
 }
 
-
-document.getElementById("loadOSM").addEventListener(
-  "click",
-  async ()=>{
-
-    const button = document.getElementById("loadOSM");
-
-    const selectedAOI = getSelectedAOI();
-
-    let bounds;
-
-    if(selectedAOI){
-
-      bounds = L.geoJSON(selectedAOI).getBounds();
-
-    }else{
-
-      bounds = map.getBounds();
-
-    }
-
-    if(map.getZoom()<11 && !selectedAOI){
-
-      alert(
-        "Please zoom into an urban area or select an administrative area before loading OSM features."
-      );
-
-      return;
-
-    }
-
-    if(!bounds || !bounds.isValid()){
-
-      alert("Invalid extraction boundary.");
-
-      return;
-
-    }
-
-    const bbox = [
-
-      bounds.getSouth(),
-      bounds.getWest(),
-      bounds.getNorth(),
-      bounds.getEast()
-
-    ].join(",");
-
-
-    button.disabled = true;
-
-    button.textContent = "RETRIEVING OSM DATA...";
-
-
-    try{
-
-      const query = `
-[out:json][timeout:40];
-(
-  way["building"](${bbox});
-  way["highway"](${bbox});
-  way["leisure"](${bbox});
-  way["landuse"~"grass|forest|meadow|industrial|commercial|reservoir|basin"](${bbox});
-  way["natural"~"wood|water"](${bbox});
-  way["waterway"](${bbox});
-);
-out body geom;
-`;
-
-
-      const endpoints = [
-
-        "https://overpass-api.de/api/interpreter",
-
-        "https://overpass.kumi.systems/api/interpreter"
-
-      ];
-
-      let data = null;
-
-      let lastError = null;
-
-
-      for(const endpoint of endpoints){
-
-        try{
-
-          const response = await fetch(endpoint,{
-
-            method:"POST",
-
-            headers:{
-              "Content-Type":"application/x-www-form-urlencoded"
-            },
-
-            body:"data="+encodeURIComponent(query)
-
-          });
-
-          if(!response.ok){
-
-            throw new Error("HTTP " + response.status);
-
-          }
-
-          data = await response.json();
-
-          break;
-
-        }catch(err){
-
-          lastError = err;
-
-        }
-
-      }
-
-
-      if(!data){
-
-        throw lastError || new Error("No Overpass server responded.");
-
-      }
-
-
-      const geo = overpassToGeoJSON(data);
-
-
-      Object.keys(state.osm).forEach(k=>{
-
-        state.osm[k] = [];
-
-      });
-
-
-      geo.features.forEach(f=>{
-
-        const type = classifyOSM(f);
-
-        if(type){
-
-          state.osm[type].push(f);
-
-        }
-
-      });
-
-
-      // IMPORTANT: Apply AOI filtering before display and analysis.
-
-      refreshSpatialLayers();
-
-      updateDataTable();
-
-      setNotice(
-
-        "OSM retrieval complete. " +
-        geo.features.length +
-        " source features retrieved. Selected-area filtering applied."
-
-      );
-
-    }catch(err){
-
-      alert(
-        "OSM extraction failed: " +
-        err.message +
-        ". Try again later or use a smaller area."
-      );
-
-    }finally{
-
-      button.disabled = false;
-
-      button.textContent = "LOAD OSM ENVIRONMENTAL FEATURES";
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   12. LAYER VISIBILITY
-========================================================= */
-
-const visibility = {
-
-  admin:"showAdmin",
-  buildings:"showBuildings",
-  roads:"showRoads",
-  green:"showGreen",
-  water:"showWater",
-  industry:"showIndustry",
-  environmental:"showEnvironmental",
-  csv:"showCSV",
-  raster:"showRaster"
-
-};
-
-
-function applyVisibility(){
-
-  Object.entries(visibility).forEach(([group,id])=>{
-
-    const visible = document.getElementById(id).checked;
-
-    if(visible){
-
-      if(group==="raster"){
-
-        if(!getSelectedAOI() && state.rasterLayer){
-
-          groups.raster.addLayer(state.rasterLayer);
-
-        }
-
-      }else{
-
-        if(!map.hasLayer(groups[group])){
-
-          groups[group].addTo(map);
-
-        }
-
-      }
-
-    }else{
-
-      if(map.hasLayer(groups[group])){
-
-        map.removeLayer(groups[group]);
-
-      }
-
-    }
-
-  });
-
-}
-
-
-Object.values(visibility).forEach(id=>{
-
-  document.getElementById(id).addEventListener(
-    "change",
-    applyVisibility
+document.getElementById("loadOSM").addEventListener("click",async()=>{
+ const button=document.getElementById("loadOSM");
+ const b=map.getBounds();
+ const bbox=[
+  b.getSouth().toFixed(5),b.getWest().toFixed(5),
+  b.getNorth().toFixed(5),b.getEast().toFixed(5)
+ ].join(",");
+ if(map.getZoom()<11){
+  alert("Please zoom into an urban area (zoom level 11 or higher) before loading OSM features.");
+  return;
+ }
+ button.disabled=true;
+ button.textContent="RETRIEVING OSM DATA...";
+ try{
+  const query=`[out:json][timeout:40];
+  (
+   way["building"](${bbox});
+   way["highway"](${bbox});
+   way["leisure"](${bbox});
+   way["landuse"~"grass|forest|meadow|industrial|commercial|reservoir|basin"](${bbox});
+   way["natural"~"wood|water"](${bbox});
+   way["waterway"](${bbox});
+   relation["leisure"](${bbox});
+   relation["landuse"](${bbox});
+   relation["natural"="water"](${bbox});
   );
+  out body geom;`;
+  const endpoints=[
+   "https://overpass-api.de/api/interpreter",
+   "https://overpass.kumi.systems/api/interpreter"
+  ];
+  let data=null,lastError=null;
+  for(const endpoint of endpoints){
+   try{
+    const response=await fetch(endpoint,{
+     method:"POST",
+     headers:{"Content-Type":"application/x-www-form-urlencoded"},
+     body:"data="+encodeURIComponent(query)
+    });
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    data=await response.json();
+    break;
+   }catch(err){lastError=err}
+  }
+  if(!data)throw lastError||new Error("No Overpass server responded.");
 
+  const geo=overpassToGeoJSON(data);
+  Object.keys(state.osm).forEach(k=>state.osm[k]=[]);
+  geo.features.forEach(f=>{
+   const type=classifyOSM(f);
+   if(type)state.osm[type].push(f);
+  });
+  redrawOSM();
+  updateAnalytics();
+  updateDataTable();
+  setNotice("OSM retrieval complete. "+geo.features.length+" mapped features retrieved in the current map extent.");
+ }catch(err){
+  alert("OSM extraction failed: "+err.message+
+   ". Try again later or use a smaller map extent.");
+ }finally{
+  button.disabled=false;
+  button.textContent="LOAD OSM ENVIRONMENTAL FEATURES";
+ }
 });
 
+function redrawOSM(){
+ ["buildings","roads","green","water","industry"].forEach(k=>{
+  groups[k].clearLayers();
+  if(state.osm[k].length){
+   groups[k].addData({type:"FeatureCollection",features:state.osm[k]});
+  }
+ });
+ applyVisibility();
+}
 
 /* =========================================================
-   13. ENVIRONMENTAL ANALYTICS
+   5. LAYER VISIBILITY
+========================================================= */
+
+const visibility={
+ admin:"showAdmin",
+ buildings:"showBuildings",
+ roads:"showRoads",
+ green:"showGreen",
+ water:"showWater",
+ industry:"showIndustry",
+ raster:"showRaster"
+};
+
+function applyVisibility(){
+ Object.entries(visibility).forEach(([group,id])=>{
+  const visible=document.getElementById(id).checked;
+  if(visible)addGroup(group);
+  else if(map.hasLayer(groups[group]))map.removeLayer(groups[group]);
+ });
+ if(state.environmental.length)addGroup("environmental");
+ if(state.csvCount)addGroup("csv");
+}
+
+Object.values(visibility).forEach(id=>{
+ document.getElementById(id).addEventListener("change",applyVisibility);
+});
+
+/* =========================================================
+   6. ENVIRONMENTAL ANALYTICS
 ========================================================= */
 
 function formatNumber(value,digits=2){
-
-  return Number.isFinite(value)
-    ? value.toLocaleString("en-US",{
-        minimumFractionDigits:digits,
-        maximumFractionDigits:digits
-      })
-    : "0";
-
+ return Number.isFinite(value)?value.toLocaleString("en-US",{
+  minimumFractionDigits:digits,maximumFractionDigits:digits
+ }):"0";
 }
-
 
 function areaKm2(features){
-
-  let total = 0;
-
-  features.forEach(f=>{
-
-    try{
-
-      if(
-        ["Polygon","MultiPolygon"].includes(f.geometry?.type)
-      ){
-
-        total += turf.area(f)/1000000;
-
-      }
-
-    }catch(e){}
-
-  });
-
-  return total;
-
+ let total=0;
+ features.forEach(f=>{
+  try{
+   if(["Polygon","MultiPolygon"].includes(f.geometry?.type)){
+    total+=turf.area(f)/1000000;
+   }
+  }catch(e){}
+ });
+ return total;
 }
-
 
 function lengthKm(features){
-
-  let total = 0;
-
-  features.forEach(f=>{
-
-    try{
-
-      if(
-        ["LineString","MultiLineString"].includes(f.geometry?.type)
-      ){
-
-        total += turf.length(
-          f,
-          {units:"kilometers"}
-        );
-
-      }
-
-    }catch(e){}
-
-  });
-
-  return total;
-
+ let total=0;
+ features.forEach(f=>{
+  try{
+   if(["LineString","MultiLineString"].includes(f.geometry?.type)){
+    total+=turf.length(f,{units:"kilometers"});
+   }
+  }catch(e){}
+ });
+ return total;
 }
-
 
 function countGeometry(features,types){
-
-  return features.filter(
-    f=>types.includes(f.geometry?.type)
-  ).length;
-
+ return features.filter(f=>types.includes(f.geometry?.type)).length;
 }
 
+function getAllFeatures(key){
+ return state.osm[key]||[];
+}
 
 function getAttributeSummary(){
-
-  const fs = filteredData.environmental;
-
-  if(!fs.length) return null;
-
-  const numericKeys = {};
-
-  fs.slice(0,1000).forEach(f=>{
-
-    Object.entries(f.properties || {}).forEach(([key,value])=>{
-
-      if(
-        value!=="" &&
-        value!==null &&
-        Number.isFinite(Number(value))
-      ){
-
-        numericKeys[key] = (numericKeys[key] || 0)+1;
-
-      }
-
-    });
-
+ const fs=state.environmental;
+ if(!fs.length)return null;
+ const numericKeys={};
+ fs.slice(0,300).forEach(f=>{
+  Object.entries(f.properties||{}).forEach(([key,value])=>{
+   if(value!==""&&value!==null&&Number.isFinite(Number(value))){
+    numericKeys[key]=(numericKeys[key]||0)+1;
+   }
   });
-
-
-  const key = Object.keys(numericKeys).sort(
-    (a,b)=>numericKeys[b]-numericKeys[a]
-  )[0];
-
-  if(!key) return null;
-
-  const values = fs
-    .map(f=>Number(f.properties?.[key]))
-    .filter(Number.isFinite);
-
-  if(!values.length) return null;
-
-  return {key,values};
-
+ });
+ const key=Object.keys(numericKeys).sort((a,b)=>numericKeys[b]-numericKeys[a])[0];
+ if(!key)return null;
+ const values=fs.map(f=>Number(f.properties?.[key])).filter(Number.isFinite);
+ if(!values.length)return null;
+ return {key,values};
 }
-
 
 function updateAnalytics(){
+ const buildings=getAllFeatures("buildings");
+ const roads=getAllFeatures("roads");
+ const green=getAllFeatures("green");
+ const water=getAllFeatures("water");
+ const industry=getAllFeatures("industry");
 
-  // All indicators are based on filtered data.
+ const buildingCount=countGeometry(buildings,["Polygon","MultiPolygon","Point"]);
+ const roadLength=lengthKm(roads);
+ const greenArea=areaKm2(green);
+ const waterArea=areaKm2(water);
+ const total=buildings.length+roads.length+green.length+water.length+
+  industry.length+state.environmental.length+state.csvCount;
 
-  const buildings = filteredData.buildings;
-  const roads = filteredData.roads;
-  const green = filteredData.green;
-  const water = filteredData.water;
-  const industry = filteredData.industry;
-  const environmental = filteredData.environmental;
-  const csv = filteredData.csv;
+ document.getElementById("kBuildings").textContent=buildingCount.toLocaleString();
+ document.getElementById("kRoads").textContent=formatNumber(roadLength);
+ document.getElementById("kGreen").textContent=formatNumber(greenArea);
+ document.getElementById("kWater").textContent=formatNumber(waterArea);
+ document.getElementById("kIndustry").textContent=industry.length.toLocaleString();
+ document.getElementById("kTotal").textContent=total.toLocaleString();
 
-
-  const buildingCount = countGeometry(
-    buildings,
-    ["Polygon","MultiPolygon","Point"]
-  );
-
-  const roadLength = lengthKm(roads);
-
-  const greenArea = areaKm2(green);
-
-  const waterArea = areaKm2(water);
-
-  const total =
-
-    buildings.length +
-    roads.length +
-    green.length +
-    water.length +
-    industry.length +
-    environmental.length +
-    csv.length;
-
-
-  document.getElementById("kBuildings").textContent =
-    buildingCount.toLocaleString();
-
-  document.getElementById("kRoads").textContent =
-    formatNumber(roadLength);
-
-  document.getElementById("kGreen").textContent =
-    formatNumber(greenArea);
-
-  document.getElementById("kWater").textContent =
-    formatNumber(waterArea);
-
-  document.getElementById("kIndustry").textContent =
-    industry.length.toLocaleString();
-
-  document.getElementById("kEnvironmental").textContent =
-    environmental.length.toLocaleString();
-
-  document.getElementById("kCSV").textContent =
-    csv.length.toLocaleString();
-
-  document.getElementById("kTotal").textContent =
-    total.toLocaleString();
-
-
-  updateCharts({
-
-    buildings:buildings.length,
-    roads:roads.length,
-    green:green.length,
-    water:water.length,
-    industry:industry.length,
-    environmental:environmental.length,
-    csv:csv.length
-
-  });
-
-
-  updateAttributeChart();
-
-  updateInterpretation({
-
-    buildingCount,
-    roadLength,
-    greenArea,
-    waterArea,
-    industryCount:industry.length,
-    environmentalCount:environmental.length,
-    csvCount:csv.length
-
-  });
-
+ updateCharts({
+  buildings:buildingCount,roads:roads.length,green:green.length,
+  water:water.length,industry:industry.length
+ });
+ updateAttributeChart();
+ updateInterpretation({
+  buildingCount,roadLength,greenArea,waterArea,industryCount:industry.length
+ });
 }
-
-
-/* =========================================================
-   14. INTERPRETATION
-========================================================= */
 
 function updateInterpretation(s){
-
-  const lines = [];
-
-  const selected = getSelectedAOI();
-
-  const region = document.getElementById("region").value;
-  const district = document.getElementById("district").value;
-  const ward = document.getElementById("ward").value;
-
-  let selection = "The Gambia national view";
-
-  if(ward) selection = "Selected ward: " + ward;
-  else if(district) selection = "Selected district: " + district;
-  else if(region) selection = "Selected region: " + region;
-
-
-  lines.push(selection + ".");
-
-  if(!s.buildingCount && !s.roadLength &&
-     !s.greenArea && !s.waterArea &&
-     !s.environmentalCount && !s.csvCount){
-
-    lines.push(
-      "No environmental observations are currently loaded."
-    );
-
-  }else{
-
-    lines.push(
-      "The analysed area contains " +
-      s.buildingCount +
-      " mapped building features and " +
-      formatNumber(s.roadLength) +
-      " km of mapped roads."
-    );
-
-    lines.push(
-      "Mapped green-space polygons cover " +
-      formatNumber(s.greenArea) +
-      " km², while mapped water polygons cover " +
-      formatNumber(s.waterArea) +
-      " km²."
-    );
-
-    lines.push(
-      "Industrial features: " +
-      s.industryCount +
-      ". Uploaded environmental features: " +
-      s.environmentalCount +
-      ". CSV observations: " +
-      s.csvCount +
-      "."
-    );
-
-  }
-
-  lines.push(
-    selected
-      ? "Spatial features outside the selected administrative geometry are excluded from vector display and analytics."
-      : "Statistics represent the available national datasets."
-  );
-
-  lines.push(
-    "These values describe mapped records, not complete environmental coverage or measured environmental quality."
-  );
-
-  document.getElementById("interpretation").textContent =
-    lines.join(" ");
-
+ const lines=[];
+ if(!s.buildingCount&&!s.roadLength&&!s.greenArea&&!s.waterArea){
+  lines.push("No OSM environmental observations are currently loaded.");
+ }else{
+  lines.push("The current mapped extent contains "+s.buildingCount+
+   " building features and "+formatNumber(s.roadLength)+
+   " km of mapped roads.");
+  lines.push("Mapped green-space polygons cover "+
+   formatNumber(s.greenArea)+" km², while mapped water polygons cover "+
+   formatNumber(s.waterArea)+" km².");
+  lines.push("Industrial features: "+s.industryCount+".");
+ }
+ lines.push("These values describe mapped records in the current extraction, not complete environmental coverage or measured environmental quality.");
+ document.getElementById("interpretation").textContent=lines.join(" ");
 }
 
-
 /* =========================================================
-   15. CHARTS
+   7. CHARTS
 ========================================================= */
 
-Chart.defaults.color = "#a9bdcc";
-Chart.defaults.font.family = "Manrope";
-Chart.defaults.font.size = 10;
-
+Chart.defaults.color="#a9bdcc";
+Chart.defaults.font.family="Manrope";
+Chart.defaults.font.size=10;
 
 function destroyChart(key){
-
-  if(state.charts[key]){
-
-    state.charts[key].destroy();
-
-    state.charts[key] = null;
-
-  }
-
+ if(state.charts[key])state.charts[key].destroy();
 }
-
 
 function updateCharts(data){
-
-  const labels = [
-    "Buildings",
-    "Roads",
-    "Green spaces",
-    "Water",
-    "Industry",
-    "Uploaded vectors",
-    "CSV points"
-  ];
-
-  const values = [
-    data.buildings,
-    data.roads,
-    data.green,
-    data.water,
-    data.industry,
-    data.environmental,
-    data.csv
-  ];
-
-  const colors = [
-    "#4e9fff",
-    "#f4a340",
-    "#31c48d",
-    "#49d5d0",
-    "#ad91ff",
-    "#ffca68",
-    "#ed8299"
-  ];
-
-
-  destroyChart("composition");
-
-  destroyChart("count");
-
-
-  state.charts.composition = new Chart(
-
-    document.getElementById("compositionChart"),
-
-    {
-
-      type:"doughnut",
-
-      data:{
-
-        labels,
-
-        datasets:[{
-
-          data:values,
-
-          backgroundColor:colors,
-
-          borderWidth:0
-
-        }]
-
-      },
-
-      options:{
-
-        responsive:true,
-
-        maintainAspectRatio:true,
-
-        plugins:{
-
-          legend:{
-
-            position:"bottom",
-
-            labels:{
-
-              boxWidth:9,
-
-              padding:10
-
-            }
-
-          }
-
-        }
-
-      }
-
-    }
-
-  );
-
-
-  state.charts.count = new Chart(
-
-    document.getElementById("countChart"),
-
-    {
-
-      type:"bar",
-
-      data:{
-
-        labels,
-
-        datasets:[{
-
-          label:"Mapped features",
-
-          data:values,
-
-          backgroundColor:colors,
-
-          borderRadius:4
-
-        }]
-
-      },
-
-      options:{
-
-        responsive:true,
-
-        maintainAspectRatio:true,
-
-        plugins:{
-
-          legend:{display:false}
-
-        },
-
-        scales:{
-
-          x:{grid:{display:false}},
-
-          y:{
-
-            beginAtZero:true,
-
-            grid:{color:"#26394a"}
-
-          }
-
-        }
-
-      }
-
-    }
-
-  );
-
+ const labels=["Buildings","Roads","Green spaces","Water","Industry"];
+ const values=[data.buildings,data.roads,data.green,data.water,data.industry];
+ destroyChart("composition");
+ destroyChart("count");
+
+ state.charts.composition=new Chart(
+  document.getElementById("compositionChart"),{
+   type:"doughnut",
+   data:{labels,datasets:[{
+    data:values,backgroundColor:[
+     "#4e9fff","#f4a340","#31c48d","#49d5d0","#ad91ff"
+    ],borderWidth:0
+   }]},
+   options:{
+    responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{position:"bottom",labels:{boxWidth:9,padding:12}}}
+   }
+  }
+ );
+
+ state.charts.count=new Chart(document.getElementById("countChart"),{
+  type:"bar",
+  data:{labels,datasets:[{
+   label:"Mapped features",data:values,
+   backgroundColor:["#4e9fff","#f4a340","#31c48d","#49d5d0","#ad91ff"],
+   borderRadius:4
+  }]},
+  options:{
+   responsive:true,maintainAspectRatio:true,
+   plugins:{legend:{display:false}},
+   scales:{
+    x:{grid:{display:false}},
+    y:{beginAtZero:true,grid:{color:"#26394a"}}
+   }
+  }
+ });
 }
-
 
 function updateAttributeChart(){
-
-  const result = getAttributeSummary();
-
-  destroyChart("attributes");
-
-  if(!result){
-
-    document.getElementById("attributeNote").textContent =
-      "Upload vector data with numeric attributes to populate this chart.";
-
-    return;
-
-  }
-
-  const vals = result.values.slice(0,1000);
-
-  document.getElementById("attributeNote").textContent =
-
-    "Attribute: " + result.key +
-    " | " + vals.length +
-    " valid numeric records within the selected area.";
-
-
-  state.charts.attributes = new Chart(
-
-    document.getElementById("attributeChart"),
-
-    {
-
-      type:"bar",
-
-      data:{
-
-        labels:vals.map((_,i)=>i+1),
-
-        datasets:[{
-
-          label:result.key,
-
-          data:vals,
-
-          backgroundColor:"#49d5d0"
-
-        }]
-
-      },
-
-      options:{
-
-        responsive:true,
-
-        maintainAspectRatio:true,
-
-        plugins:{
-
-          legend:{display:false}
-
-        },
-
-        scales:{
-
-          x:{display:false},
-
-          y:{grid:{color:"#26394a"}}
-
-        }
-
-      }
-
+ const result=getAttributeSummary();
+ destroyChart("attributes");
+ if(!result){
+  document.getElementById("attributeNote").textContent=
+   "Upload vector data with numeric attributes to populate this chart.";
+  return;
+ }
+ const vals=result.values.slice(0,1000);
+ document.getElementById("attributeNote").textContent=
+  "Attribute: "+result.key+" | First "+vals.length+" valid numeric records.";
+ state.charts.attributes=new Chart(
+  document.getElementById("attributeChart"),{
+   type:"bar",
+   data:{
+    labels:vals.map((_,i)=>i+1),
+    datasets:[{label:result.key,data:vals,backgroundColor:"#49d5d0"}]
+   },
+   options:{
+    responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{
+     x:{display:false},
+     y:{grid:{color:"#26394a"}}
     }
-
-  );
-
+   }
+  }
+ );
 }
 
-
 /* =========================================================
-   16. DATA TABLE
+   8. DATA TABLE
 ========================================================= */
 
 function updateDataTable(){
-
-  const osmCount = Object.values(state.osm)
-    .reduce((a,b)=>a+b.length,0);
-
-  const filteredOSMCount =
-
-    filteredData.buildings.length +
-    filteredData.roads.length +
-    filteredData.green.length +
-    filteredData.water.length +
-    filteredData.industry.length;
-
-
-  const rows = [
-
-    [
-      "Administrative",
-      state.filteredAdmin.length,
-      state.admin ? "Loaded" : "Pending"
-    ],
-
-    [
-      "Environmental",
-      filteredData.environmental.length,
-      state.environmental.length ? "Filtered" : "Pending"
-    ],
-
-    [
-      "OpenStreetMap",
-      filteredOSMCount,
-      osmCount ? "Filtered" : "Pending"
-    ],
-
-    [
-      "CSV points",
-      filteredData.csv.length,
-      state.csvCount ? "Filtered" : "Pending"
-    ]
-
-  ];
-
-
-  document.getElementById("dataTable").innerHTML =
-    rows.map(r=>
-
-      "<tr><td>" +
-      escapeHTML(r[0]) +
-      "</td><td>" +
-      r[1].toLocaleString() +
-      "</td><td>" +
-      escapeHTML(r[2]) +
-      "</td></tr>"
-
-    ).join("");
-
+ const rows=[
+  ["Administrative",state.adminFeatures.length,state.admin?"Loaded":"Pending"],
+  ["Environmental",state.environmental.length,state.environmental.length?"Loaded":"Pending"],
+  ["OpenStreetMap",Object.values(state.osm).reduce((a,b)=>a+b.length,0),
+   Object.values(state.osm).some(x=>x.length)?"Loaded":"Pending"],
+  ["CSV points",state.csvCount,state.csvCount?"Loaded":"Pending"]
+ ];
+ document.getElementById("dataTable").innerHTML=rows.map(r=>
+  "<tr><td>"+escapeHTML(r[0])+"</td><td>"+r[1].toLocaleString()+
+  "</td><td>"+escapeHTML(r[2])+"</td></tr>"
+ ).join("");
 }
 
-
 /* =========================================================
-   17. EXPORT FUNCTIONS
+   9. EXPORT FUNCTIONS
 ========================================================= */
 
 function downloadBlob(content,type,filename){
-
-  const blob = new Blob([content],{type});
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-
-  a.click();
-
-  a.remove();
-
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-
+ const blob=new Blob([content],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download=filename;
+ document.body.appendChild(a);a.click();a.remove();
+ URL.revokeObjectURL(url);
 }
 
+document.getElementById("exportGeo").addEventListener("click",()=>{
+ const all=[
+  ...state.environmental,
+  ...Object.values(state.osm).flat(),
+  ...state.adminFeatures
+ ];
+ if(!all.length){
+  alert("No vector data available for export.");
+  return;
+ }
+ downloadBlob(JSON.stringify({
+  type:"FeatureCollection",features:all
+ },null,2),"application/geo+json","gambia_urban_environment_data.geojson");
+});
 
-function getSelectedExportFeatures(){
-
-  return [
-
-    ...filteredData.environmental,
-    ...filteredData.buildings,
-    ...filteredData.roads,
-    ...filteredData.green,
-    ...filteredData.water,
-    ...filteredData.industry,
-    ...filteredData.csv,
-    ...state.filteredAdmin
-
-  ];
-
-}
-
-
-document.getElementById("exportGeo").addEventListener(
-  "click",
-  ()=>{
-
-    const all = getSelectedExportFeatures();
-
-    if(!all.length){
-
-      alert("No vector data available for export.");
-
-      return;
-
-    }
-
-    const geojson = {
-
-      type:"FeatureCollection",
-
-      features:all
-
-    };
-
-    downloadBlob(
-
-      JSON.stringify(geojson,null,2),
-
-      "application/geo+json",
-
-      "gambia_selected_area_environment.geojson"
-
-    );
-
-  }
-);
-
-
-document.getElementById("exportCSV").addEventListener(
-  "click",
-  ()=>{
-
-    const data = [
-
-      ["Indicator","Value","Unit"],
-
-      ["Mapped buildings",
-        filteredData.buildings.length,"Features"],
-
-      ["Mapped road features",
-        filteredData.roads.length,"Features"],
-
-      ["Road length",
-        lengthKm(filteredData.roads),"km"],
-
-      ["Green space area",
-        areaKm2(filteredData.green),"km2"],
-
-      ["Water area",
-        areaKm2(filteredData.water),"km2"],
-
-      ["Industrial features",
-        filteredData.industry.length,"Features"],
-
-      ["Uploaded environmental features",
-        filteredData.environmental.length,"Features"],
-
-      ["CSV points",
-        filteredData.csv.length,"Points"]
-
-    ];
-
-
-    const csv = data.map(row=>
-
-      row.map(v=>
-
-        '"' + String(v).replace(/"/g,'""') + '"'
-
-      ).join(",")
-
-    ).join("\n");
-
-
-    downloadBlob(
-
-      csv,
-
-      "text/csv;charset=utf-8",
-
-      "gambia_selected_area_environment_analytics.csv"
-
-    );
-
-  }
-);
-
+document.getElementById("exportCSV").addEventListener("click",()=>{
+ const data=[
+  ["Indicator","Value","Unit"],
+  ["Mapped buildings",getAllFeatures("buildings").length,"Features"],
+  ["Mapped road features",getAllFeatures("roads").length,"Features"],
+  ["Road length",lengthKm(getAllFeatures("roads")),"km"],
+  ["Green space area",areaKm2(getAllFeatures("green")),"km2"],
+  ["Water area",areaKm2(getAllFeatures("water")),"km2"],
+  ["Industrial features",getAllFeatures("industry").length,"Features"],
+  ["Uploaded environmental features",state.environmental.length,"Features"],
+  ["CSV points",state.csvCount,"Points"]
+ ];
+ const csv=data.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+ downloadBlob(csv,"text/csv;charset=utf-8","gambia_urban_environment_analytics.csv");
+});
 
 /* =========================================================
-   18. CLEAR UPLOADED DATA
+   10. RESET AND CLEAR
 ========================================================= */
 
 function clearUploadedData(){
+ state.admin=null;
+ state.adminFeatures=[];
+ state.filteredAdmin=[];
+ state.environmental=[];
+ state.csvCount=0;
+ state.osm={buildings:[],roads:[],green:[],water:[],industry:[]};
+ if(state.rasterLayer)groups.raster.removeLayer(state.rasterLayer);
+ state.rasterLayer=null;
+ state.raster=null;
 
-  state.admin = null;
+ Object.values(groups).forEach(g=>g.clearLayers());
+ document.getElementById("adminFile").value="";
+ document.getElementById("vectorFile").value="";
+ document.getElementById("csvFile").value="";
+ document.getElementById("rasterFile").value="";
+ adminFields={region:null,district:null,ward:null};
 
-  state.adminFeatures = [];
+ populateSelect("region",[],"All regions");
+ populateSelect("district",[],"All districts");
+ populateSelect("ward",[],"All wards");
 
-  state.filteredAdmin = [];
-
-  state.environmental = [];
-
-  state.csvFeatures = [];
-
-  state.csvCount = 0;
-
-  state.osm = {
-
-    buildings:[],
-    roads:[],
-    green:[],
-    water:[],
-    industry:[]
-
-  };
-
-
-  if(state.rasterLayer){
-
-    groups.raster.removeLayer(state.rasterLayer);
-
-  }
-
-  state.rasterLayer = null;
-
-  state.raster = null;
-
-
-  Object.values(groups).forEach(g=>{
-
-    g.clearLayers();
-
-  });
-
-
-  [
-    "adminFile",
-    "vectorFile",
-    "csvFile",
-    "rasterFile"
-  ].forEach(id=>{
-
-    document.getElementById(id).value="";
-
-  });
-
-
-  adminFields = {
-
-    region:null,
-    district:null,
-    ward:null
-
-  };
-
-
-  populateSelect("region",[],"All regions");
-
-  populateSelect("district",[],"All districts");
-
-  populateSelect("ward",[],"All wards");
-
-
-  document.getElementById("rasterStatus").textContent =
-    "NOT LOADED";
-
-  document.getElementById("rasterDetails").textContent =
-    "Upload GeoTIFF to visualize raster data.";
-
-
-  refreshSpatialLayers();
-
-  refreshAdmin();
-
-  updateDataTable();
-
-  setNotice("Uploaded datasets cleared.");
-
+ document.getElementById("rasterStatus").textContent="NOT LOADED";
+ document.getElementById("rasterDetails").textContent="Upload GeoTIFF to visualize raster data.";
+ applyVisibility();
+ updateDataTable();
+ updateAnalytics();
+ setNotice("Uploaded datasets cleared.");
 }
 
+document.getElementById("clearUploads").addEventListener("click",()=>{
+ if(confirm("Clear all uploaded and retrieved spatial data?"))clearUploadedData();
+});
 
-document.getElementById("clearUploads").addEventListener(
-  "click",
-  ()=>{
-
-    if(confirm("Clear all uploaded and retrieved spatial data?")){
-
-      clearUploadedData();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   19. RESET MAP AND FILTERS
-========================================================= */
-
-document.getElementById("resetMap").addEventListener(
-  "click",
-  ()=>{
-
-    clearUploadedData();
-
-    ["showAdmin","showBuildings","showRoads",
-     "showGreen","showWater","showIndustry",
-     "showEnvironmental","showCSV","showRaster"
-    ].forEach(id=>{
-
-      document.getElementById(id).checked=true;
-
-    });
-
-
-    document.getElementById("basemap").value="street";
-
-    Object.values(baseLayers).forEach(layer=>{
-
-      if(map.hasLayer(layer)){
-
-        map.removeLayer(layer);
-
-      }
-
-    });
-
-    baseLayers.street.addTo(map);
-
-    currentBasemap="street";
-
-    map.setView(GAMBIA_CENTER,8);
-
-    document.getElementById("mapStatus").textContent =
-      "GAMBIA NATIONAL VIEW";
-
-    applyVisibility();
-
-    setNotice("Map and filters reset. National view restored.");
-
-  }
-);
-
+document.getElementById("resetMap").addEventListener("click",()=>{
+ clearUploadedData();
+ ["showAdmin","showBuildings","showRoads","showGreen","showWater",
+  "showIndustry","showRaster"].forEach(id=>{
+   document.getElementById(id).checked=true;
+  });
+ document.getElementById("basemap").value="street";
+ Object.values(baseLayers).forEach(layer=>{
+  if(map.hasLayer(layer))map.removeLayer(layer);
+ });
+ baseLayers.street.addTo(map);
+ currentBasemap="street";
+ map.setView(GAMBIA_CENTER,8);
+ document.getElementById("mapStatus").textContent="GAMBIA NATIONAL VIEW";
+});
 
 /* =========================================================
-   20. MAP EVENTS AND CLOCK
+   11. MAP EVENTS AND CLOCK
 ========================================================= */
 
 map.on("moveend",()=>{
-
-  document.getElementById("scaleLabel").textContent =
-
-    "WGS84 • EPSG:4326 • ZOOM " + map.getZoom();
-
+ document.getElementById("scaleLabel").textContent=
+  "WGS84 • EPSG:4326 • ZOOM "+map.getZoom();
 });
 
-
 function updateClock(){
-
-  document.getElementById("clock").textContent =
-
-    new Date().toLocaleString("en-GB",{
-
-      timeZone:"Africa/Banjul",
-
-      dateStyle:"medium",
-
-      timeStyle:"medium"
-
-    });
-
+ document.getElementById("clock").textContent=
+  new Date().toLocaleString("en-GB",{
+   timeZone:"Africa/Banjul",
+   dateStyle:"medium",timeStyle:"medium"
+  });
 }
-
 updateClock();
-
 setInterval(updateClock,1000);
 
-
 /* =========================================================
-   21. INITIALIZATION
+   12. INITIALIZE
 ========================================================= */
 
 updateCharts({
-
-  buildings:0,
-  roads:0,
-  green:0,
-  water:0,
-  industry:0,
-  environmental:0,
-  csv:0
-
+ buildings:0,roads:0,green:0,water:0,industry:0
 });
-
 updateDataTable();
-
 updateAnalytics();
-
 map.setView(GAMBIA_CENTER,8);
-
-setNotice(
-  "Workspace ready. Upload Gambia administrative boundaries and environmental datasets to begin."
-);
-
-
-// Ensure Leaflet calculates the correct map dimensions.
-
-setTimeout(()=>map.invalidateSize(),300);
-
-window.addEventListener("resize",()=>{
-
-  map.invalidateSize();
-
-});
-
+setNotice("Workspace ready. Upload administrative boundaries and environmental datasets to begin.");
 </script>
-
 </body>
 </html>
-
