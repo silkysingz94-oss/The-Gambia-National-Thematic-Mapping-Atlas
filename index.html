@@ -3,1636 +3,3410 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SILKYSINGZ GEOAI | GAMBIA DAILY TEMPERATURE ANOMALY ATLAS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBoS GEOAI | Gambia Urban Environment Intelligence</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/shpjs@6.2.0/dist/shp.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/georaster/dist/georaster.browser.bundle.min.js"></script>
+<script src="https://unpkg.com/georaster-layer-for-leaflet/dist/georaster-layer-for-leaflet.min.js"></script>
 
 <style>
-:root{
---bg:#080d16;--panel:#101927;--panel2:#142033;
---line:#26364a;--text:#e7eef8;--muted:#8da1b8;
---cyan:#40d9ef;--blue:#4e91ff;--orange:#ff9e45;
---red:#ff626f;--green:#51d6a0;--yellow:#f3d36b
+:root {
+  --bg:#08111b;
+  --panel:#101d2b;
+  --panel2:#142438;
+  --line:#24374a;
+  --text:#e7f0f7;
+  --muted:#8ba0b3;
+  --green:#31c48d;
+  --blue:#4e9fff;
+  --orange:#f4a340;
+  --red:#f06d69;
+  --purple:#ad91ff;
+  --cyan:#49d5d0;
 }
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,Arial,sans-serif;font-size:13px}
-button,select,input{font:inherit}
-button{cursor:pointer}
-header{padding:17px 22px;border-bottom:1px solid var(--line);background:#0b1320;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Manrope,Arial,sans-serif;
+  overflow:hidden;
+}
+
+header{
+  height:66px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  background:#0b1724;
+  border-bottom:1px solid var(--line);
+}
+
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:39px;height:39px;border:1px solid #28677c;border-radius:10px;display:grid;place-items:center;color:var(--cyan);font-weight:800;background:#102a3b;font-size:17px}
-.brand-name{font-weight:800;letter-spacing:2px;font-size:14px}
-.brand-sub{font:10px "DM Mono",monospace;color:var(--muted);margin-top:4px}
-.header-right{text-align:right}
-.header-right strong{font-size:11px;letter-spacing:1px}
-.header-right div{font:10px "DM Mono",monospace;color:var(--muted);margin-top:5px}
-main{padding:17px 18px 25px}
-.hero{margin-bottom:15px}
-.eyebrow{font:10px "DM Mono",monospace;color:var(--cyan);letter-spacing:2px}
-h1{font-size:21px;margin:6px 0 5px}
-.subtitle{color:var(--muted);font-size:11px;line-height:1.6}
-.status-line{display:flex;align-items:center;gap:8px;margin-top:12px;font:10px "DM Mono",monospace;color:var(--muted);flex-wrap:wrap}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
-.dot.busy{background:var(--yellow)}
-.dot.error{background:var(--red)}
-.workspace{display:grid;grid-template-columns:270px minmax(350px,1fr) 300px;gap:13px;align-items:stretch}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:11px;min-width:0;overflow:hidden}
-.panel-heading{padding:13px 14px;border-bottom:1px solid var(--line);font-size:10px;font-weight:800;letter-spacing:1.5px;display:flex;justify-content:space-between;align-items:center}
-.panel-body,.analytics-body{padding:13px}
-.control-panel,.analytics-panel{height:calc(100vh - 235px);min-height:500px}
-.control-panel .panel-body,.analytics-panel .analytics-body{max-height:calc(100vh - 295px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#38516b #0b1421}
-.section-label{color:var(--muted);font:10px "DM Mono",monospace;letter-spacing:1px;margin:15px 0 8px}
-.section-label:first-child{margin-top:0}
-.field{margin-bottom:10px}
-.field label{display:block;color:#aebed0;font-size:10px;margin-bottom:6px}
-select,input[type=date]{width:100%;background:#0b1421;color:var(--text);border:1px solid #30445c;border-radius:6px;padding:9px;outline:none;font-size:11px}
-select:focus,input:focus{border-color:var(--cyan)}
-.btn{border:1px solid #36516b;border-radius:6px;background:#17283a;color:var(--text);padding:9px 11px;font-size:10px;font-weight:800}
-.btn:hover{border-color:var(--cyan)}
-.btn.primary{background:#0e5265;border-color:#197c91;color:#eaffff}
-.btn.danger{border-color:#713e48;background:#321c27;color:#ffb4bc}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.button-row{display:flex;gap:7px;flex-wrap:wrap}
-.button-row .btn{flex:1}
-.hint{color:var(--muted);font-size:10px;line-height:1.6;background:#0b1421;border:1px solid #25364b;border-radius:7px;padding:9px;margin-top:10px}
-.progress-wrap{margin-top:12px}
-.progress-track{height:5px;background:#263448;border-radius:8px;overflow:hidden}
-.progress-bar{height:100%;width:0;background:var(--cyan);transition:width .3s}
-.progress-text{font:9px "DM Mono",monospace;color:var(--muted);margin-top:6px}
-.area-status{font:9px "DM Mono",monospace;color:var(--muted);line-height:1.6;margin-top:7px}
-.area-status strong{color:var(--cyan)}
-.map-panel{display:flex;flex-direction:column}
-.map-top{padding:11px 13px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-.map-top strong{font-size:10px;letter-spacing:1px}
-.map-tools{display:flex;gap:6px;align-items:center}
-.map-tools select{width:auto;padding:6px 8px;font-size:10px}
-#map{height:570px;min-height:430px;background:#0a1521}
-.map-caption{padding:10px 13px;background:#0d1725;border-top:1px solid var(--line);font:10px "DM Mono",monospace;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.legend{display:flex;gap:12px;flex-wrap:wrap;padding:10px 13px;border-top:1px solid var(--line);font-size:9px;color:var(--muted)}
-.legend span{display:flex;align-items:center;gap:5px}
-.swatch{width:9px;height:9px;border-radius:50%;display:inline-block}
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.kpi{background:#0b1421;border:1px solid #26384d;border-radius:8px;padding:11px;min-height:72px}
-.kpi-label{font:9px "DM Mono",monospace;color:var(--muted);letter-spacing:.5px}
-.kpi-value{font-size:20px;font-weight:800;margin-top:7px}
-.kpi-unit{font-size:9px;color:var(--muted);font-weight:500}
-.chart-wrap{background:#0b1421;border:1px solid #26384d;border-radius:8px;padding:10px;margin-top:12px;height:205px}
-.chart-title{font-size:10px;font-weight:800;margin-bottom:8px}
-.chart-wrap canvas{max-height:160px}
-.insight{background:#0b1421;border:1px solid #26384d;border-radius:8px;padding:11px;margin-top:12px}
-.insight h3{font-size:10px;margin:0 0 8px;letter-spacing:1px}
-.insight p{font-size:10px;line-height:1.65;color:#b6c5d5;margin:0}
-.timeline{margin-top:13px;background:#101927;border:1px solid var(--line);border-radius:10px;padding:13px}
-.timeline-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.timeline-head strong{font-size:10px;letter-spacing:1px}
-.date-readout{font:11px "DM Mono",monospace;color:var(--cyan)}
-.timeline input[type=range]{width:100%;accent-color:var(--cyan);margin:14px 0 7px}
-.timeline-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.timeline-controls .btn{min-width:45px}
-.timeline-controls select{width:auto;min-width:100px}
-.timeline-bottom{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font:9px "DM Mono",monospace;margin-top:8px}
-footer{border-top:1px solid var(--line);margin-top:17px;padding:13px 3px;color:var(--muted);font-size:9px;line-height:1.7;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.leaflet-container{font-family:Manrope,sans-serif}
-.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#101d2b;color:#e7eef8}
-.leaflet-popup-content{font-size:11px;line-height:1.7}
-.leaflet-control-attribution{font-size:9px!important}
-.scan-marker{width:18px;height:18px;border-radius:50%;background:#40e8ff;border:3px solid white;box-shadow:0 0 8px #40e8ff,0 0 20px #40e8ff;position:relative}
-.scan-marker:after{content:"";position:absolute;inset:-8px;border:1px solid #40e8ff;border-radius:50%;animation:pulse 1.2s infinite}
-@keyframes pulse{0%{transform:scale(.65);opacity:1}100%{transform:scale(1.7);opacity:0}}
-.small-note{font-size:9px;color:var(--muted);line-height:1.6}
-@media(max-width:1100px){.workspace{grid-template-columns:245px minmax(300px,1fr)}.analytics-panel{grid-column:1/-1}.analytics-body{display:grid;grid-template-columns:1fr 1fr;gap:12px}.analytics-body .kpi-grid{grid-column:1/-1}.analytics-body .chart-wrap,.analytics-body .insight{margin-top:0}}
-@media(max-width:720px){main{padding:12px}.workspace{grid-template-columns:1fr}.analytics-panel{grid-column:auto}.analytics-body{display:block}.analytics-body .chart-wrap,.analytics-body .insight{margin-top:12px}#map{height:430px;min-height:380px}.header-right{text-align:left}.control-panel,.analytics-panel{height:auto;min-height:0}.control-panel .panel-body,.analytics-panel .analytics-body{max-height:none;overflow:visible}}
+
+.logo{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  display:grid;
+  place-items:center;
+  background:#123b39;
+  color:var(--green);
+  font-size:20px;
+  font-weight:800;
+}
+
+.brand h1{font-size:15px;margin:0;letter-spacing:.6px}
+.brand p{font-size:9px;color:var(--muted);margin:3px 0 0;letter-spacing:1.5px}
+
+.header-right{display:flex;align-items:center;gap:12px}
+
+.status{
+  color:var(--green);
+  font-size:10px;
+  border:1px solid #22634f;
+  border-radius:20px;
+  padding:7px 10px;
+}
+
+.clock{font:11px "DM Mono",monospace;color:var(--muted)}
+
+.workspace{
+  height:calc(100vh - 66px);
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) minmax(360px,1fr) minmax(260px,1fr);
+  gap:8px;
+  padding:8px;
+  min-height:0;
+}
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:9px;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.panel-heading{
+  padding:13px 15px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-shrink:0;
+}
+
+.panel-heading h2{font-size:12px;letter-spacing:1px;margin:0}
+.panel-heading span{font:9px "DM Mono",monospace;color:var(--muted)}
+
+.panel-body{padding:14px;overflow-y:auto;min-height:0;flex:1}
+
+.panel-body::-webkit-scrollbar{width:5px}
+.panel-body::-webkit-scrollbar-thumb{background:#30465b;border-radius:8px}
+
+.section{margin-bottom:18px}
+
+.section-title{
+  font-size:10px;
+  color:var(--green);
+  font-weight:800;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+label{font-size:10px;color:var(--muted);display:block;margin-bottom:5px}
+
+select,input[type=file]{
+  width:100%;
+  background:#0a1725;
+  border:1px solid var(--line);
+  border-radius:5px;
+  color:var(--text);
+  padding:9px;
+  font:11px Manrope;
+  outline:none;
+}
+
+select:focus,input:focus{border-color:var(--green)}
+
+.field{margin-bottom:11px}
+
+.btn{
+  background:#174a42;
+  border:1px solid #28755e;
+  color:#c7ffeb;
+  padding:9px 12px;
+  border-radius:5px;
+  font:700 10px Manrope;
+  cursor:pointer;
+  width:100%;
+  margin-top:6px;
+}
+
+.btn:hover{background:#216454}
+.btn.secondary{background:#172a3c;border-color:#35516a;color:#d6e7f5}
+.btn.orange{background:#49351b;border-color:#805927;color:#ffda9d}
+.btn.danger{background:#422322;border-color:#79403d;color:#ffc3bf}
+.btn:disabled{opacity:.5;cursor:wait}
+
+.check{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:9px 0;
+  font-size:11px;
+  color:#d2deea;
+}
+
+.check input{accent-color:var(--green)}
+
+.small{font-size:9px;color:var(--muted);line-height:1.6}
+
+.map-panel{position:relative}
+
+#map{
+  width:100%;
+  height:100%;
+  background:#0a1520;
+}
+
+.map-tools{
+  position:absolute;
+  z-index:700;
+  top:12px;
+  left:12px;
+  right:12px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  pointer-events:none;
+}
+
+.map-tools>*{pointer-events:auto}
+
+.map-tag{
+  background:#0b1724ed;
+  border:1px solid #334b5e;
+  border-radius:5px;
+  padding:8px 10px;
+  font-size:9px;
+  color:#d6e7f5;
+  box-shadow:0 2px 10px #0005;
+}
+
+.map-tag strong{color:var(--green)}
+
+.map-footer{
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  z-index:700;
+  background:#0b1724e8;
+  border:1px solid var(--line);
+  border-radius:5px;
+  padding:7px 9px;
+  font:9px "DM Mono",monospace;
+  color:#c0d1de;
+  pointer-events:none;
+}
+
+.map-legend{
+  position:absolute;
+  bottom:10px;
+  right:10px;
+  z-index:700;
+  background:#0b1724ed;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:10px;
+  font-size:9px;
+  min-width:130px;
+}
+
+.legend-item{display:flex;align-items:center;gap:7px;margin-top:6px}
+.swatch{width:10px;height:10px;border-radius:2px}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.kpi{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  padding:12px;
+  border-radius:7px;
+  min-width:0;
+}
+
+.kpi .name{font-size:9px;color:var(--muted);line-height:1.5}
+.kpi .value{font:20px "DM Mono",monospace;margin-top:7px;overflow-wrap:anywhere}
+.kpi .unit{font-size:9px;color:var(--muted);margin-top:3px}
+
+.chart-box{
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:12px;
+  margin-bottom:12px;
+}
+
+.chart-title{font-size:10px;font-weight:800;margin-bottom:12px}
+.chart-box canvas{max-height:190px}
+
+.message{
+  padding:9px;
+  background:#102b2b;
+  border:1px solid #24564e;
+  color:#b8ead8;
+  font-size:10px;
+  border-radius:5px;
+  line-height:1.5;
+}
+
+.warning{
+  padding:9px;
+  background:#34291a;
+  border:1px solid #70522b;
+  color:#f6d7a3;
+  font-size:10px;
+  border-radius:5px;
+  line-height:1.5;
+}
+
+table{width:100%;border-collapse:collapse;font-size:9px}
+td,th{padding:8px 5px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600}
+
+footer{
+  text-align:center;
+  color:#72899c;
+  font-size:9px;
+  padding:12px;
+  border-top:1px solid var(--line);
+  line-height:1.8;
+}
+
+#notice{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{background:#102033;color:#e7f0f7}
+
+.leaflet-popup-content{font-size:11px;line-height:1.6}
+
+.aoi-label{
+  background:#0b1724;
+  border:1px solid var(--green);
+  color:var(--green);
+  border-radius:4px;
+  padding:5px 8px;
+  font-size:10px;
+}
+
+@media(max-width:950px){
+  body{overflow:auto}
+  header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px;padding:12px}
+  .workspace{height:auto;min-height:calc(100vh - 66px);grid-template-columns:1fr}
+  .panel{min-height:430px}
+  .map-panel{height:560px;min-height:560px}
+}
+
+@media(max-width:520px){
+  .brand h1{font-size:12px}
+  .status{display:none}
+  .workspace{padding:5px;gap:6px}
+}
 </style>
 </head>
 
 <body>
+
 <header>
- <div class="brand">
-  <div class="logo">G</div>
-  <div>
-   <div class="brand-name">SILKYSINGZ GEOAI</div>
-   <div class="brand-sub">GIS-CARTOGRAPHY UNIT • GBoS</div>
+  <div class="brand">
+    <div class="logo">G</div>
+    <div>
+      <h1>GBoS GEOAI | URBAN ENVIRONMENT INTELLIGENCE</h1>
+      <p>GAMBIA • SPATIAL MONITORING • ENVIRONMENTAL ANALYTICS</p>
+    </div>
   </div>
- </div>
- <div class="header-right">
-  <strong>THE GAMBIA • CLIMATE INTELLIGENCE</strong>
-  <div>DAILY TEMPERATURE ANOMALY MONITORING</div>
- </div>
+
+  <div class="header-right">
+    <div class="status">● GIS WORKSPACE ACTIVE</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
 </header>
 
-<main>
-<section class="hero">
- <div class="eyebrow">01 / CLIMATE MONITORING WORKSPACE</div>
- <h1>Gambia Daily Temperature Anomaly Atlas</h1>
- <div class="subtitle">
- Daily maximum temperature departures from a 1991–2020 calendar-day climatology.
- ERA5-Land reanalysis • Rainy-season monitoring • Dynamic spatial sample grid.
- </div>
- <div class="status-line">
-  <span class="dot" id="statusDot"></span>
-  <span id="statusText">READY • Climate data not yet loaded</span>
-  <span>│</span><span id="cacheStatus">LOCAL CACHE: CHECKING</span>
- </div>
+<main class="workspace">
+
+<!-- LEFT: CONTROLS -->
+
+<section class="panel">
+
+  <div class="panel-heading">
+    <h2>01 / CONTROL CENTRE</h2>
+    <span>DATA & LAYERS</span>
+  </div>
+
+  <div class="panel-body">
+
+    <div class="section">
+      <div class="section-title">Administrative selection</div>
+
+      <div class="field">
+        <label>Region</label>
+        <select id="region">
+          <option value="">All regions</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>District</label>
+        <select id="district">
+          <option value="">All districts</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Ward</label>
+        <select id="ward">
+          <option value="">All wards</option>
+        </select>
+      </div>
+
+      <button class="btn" id="zoomSelected">ZOOM TO SELECTION</button>
+      <button class="btn secondary" id="clearSelection">CLEAR ADMINISTRATIVE SELECTION</button>
+
+      <div class="small" style="margin-top:7px">
+        All spatial analysis is restricted to the selected administrative area.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Basemap configuration</div>
+
+      <label>Choose basemap</label>
+      <select id="basemap">
+        <option value="street">Street map</option>
+        <option value="satellite">Satellite imagery</option>
+        <option value="hybrid">Hybrid imagery</option>
+        <option value="terrain">Terrain</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Environmental layers</div>
+
+      <label class="check"><input type="checkbox" id="showAdmin" checked> Administrative boundaries</label>
+      <label class="check"><input type="checkbox" id="showBuildings" checked> Buildings</label>
+      <label class="check"><input type="checkbox" id="showRoads" checked> Road network</label>
+      <label class="check"><input type="checkbox" id="showGreen" checked> Green spaces / vegetation</label>
+      <label class="check"><input type="checkbox" id="showWater" checked> Water bodies / wetlands</label>
+      <label class="check"><input type="checkbox" id="showIndustry" checked> Industrial / commercial areas</label>
+      <label class="check"><input type="checkbox" id="showEnvironmental" checked> Uploaded environmental vectors</label>
+      <label class="check"><input type="checkbox" id="showCSV" checked> CSV observation points</label>
+      <label class="check"><input type="checkbox" id="showRaster" checked> Uploaded raster layers</label>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Load environmental data</div>
+
+      <div class="field">
+        <label>Administrative boundaries (GeoJSON / ZIP Shapefile)</label>
+        <input type="file" id="adminFile" accept=".geojson,.json,.zip">
+      </div>
+
+      <div class="field">
+        <label>Environmental vector data (GeoJSON / ZIP Shapefile)</label>
+        <input type="file" id="vectorFile" accept=".geojson,.json,.zip">
+      </div>
+
+      <div class="field">
+        <label>Environmental CSV (latitude / longitude)</label>
+        <input type="file" id="csvFile" accept=".csv">
+      </div>
+
+      <div class="field">
+        <label>Raster data (GeoTIFF)</label>
+        <input type="file" id="rasterFile" accept=".tif,.tiff">
+      </div>
+
+      <button class="btn secondary" id="clearUploads">CLEAR UPLOADED DATA</button>
+
+      <div id="notice">Waiting for datasets.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Live OpenStreetMap extraction</div>
+
+      <p class="small">
+        Retrieve mapped buildings, roads, parks, vegetation, waterways and industrial features.
+        When an administrative area is selected, the returned features are restricted to that area.
+      </p>
+
+      <button class="btn orange" id="loadOSM">LOAD OSM ENVIRONMENTAL FEATURES</button>
+
+      <div class="small" style="margin-top:7px">
+        For better performance, zoom into an urban area or select a ward before retrieving OSM data.
+        Requires an internet connection and an available Overpass API server.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Map operations</div>
+
+      <button class="btn secondary" id="resetMap">RESET MAP & FILTERS</button>
+      <button class="btn secondary" id="exportGeo">EXPORT SELECTED AREA GEOJSON</button>
+      <button class="btn secondary" id="exportCSV">EXPORT SELECTED AREA ANALYTICS CSV</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Methodological note</div>
+      <div class="warning">
+        Environmental indicators depend on data availability, spatial resolution, observation dates and completeness.
+        OSM features represent mapped objects, not a complete national inventory.
+        Uploaded vector and OSM features are spatially clipped or filtered using the selected administrative boundary.
+      </div>
+    </div>
+
+  </div>
 </section>
 
-<section class="workspace">
 
-<aside class="panel control-panel">
- <div class="panel-heading"><span>01 / CONTROL CENTRE</span><span style="color:var(--cyan)">INPUTS</span></div>
- <div class="panel-body">
-
-  <div class="section-label">TEMPORAL CONFIGURATION</div>
-  <div class="field">
-   <label>Observation year</label>
-   <select id="yearSelect">
-    <option value="2026" selected>2026</option>
-    <option value="2025">2025</option>
-   </select>
-  </div>
-  <div class="field"><label>Season start</label><input type="date" id="startDate" value="2026-06-01"></div>
-  <div class="field"><label>Season end</label><input type="date" id="endDate" value="2026-10-10"></div>
-
-  <div class="section-label">GEOGRAPHIC AREA FILTER</div>
-  <div class="field"><label>Region / Local Government Area</label><select id="regionSelect"><option value="ALL">All regions / LGAs</option></select></div>
-  <div class="field"><label>District</label><select id="districtSelect"><option value="ALL">All districts</option></select></div>
-  <div class="field"><label>Ward</label><select id="wardSelect"><option value="ALL">All wards</option></select></div>
-  <div class="button-row"><button class="btn" id="resetAreaBtn">RESET AREA</button></div>
-  <div class="area-status" id="areaStatus">Loading EA boundaries from GitHub…</div>
-
-  <div class="section-label">SPATIAL CONFIGURATION</div>
-  <div class="field">
-   <label>Sample locations per selected area</label>
-   <select id="gridSelect">
-    <option value="10">10 locations</option>
-    <option value="20">20 locations</option>
-    <option value="30" selected>30 locations</option>
-    <option value="50">50 locations</option>
-   </select>
-  </div>
-  <div class="field">
-   <label>Map basemap</label>
-   <select id="baseSelect">
-    <option value="dark" selected>Dark canvas</option>
-    <option value="street">Street map</option>
-    <option value="satellite">Satellite imagery</option>
-    <option value="terrain">Terrain</option>
-   </select>
-  </div>
-
-  <div class="section-label">PROCESSING</div>
-  <div class="button-row">
-   <button class="btn primary" id="loadBtn">LOAD CLIMATE DATA</button>
-   <button class="btn" id="resetBtn">RESET</button>
-  </div>
-  <div class="button-row" style="margin-top:7px">
-   <button class="btn" id="exportBtn" disabled>EXPORT CSV</button>
-   <button class="btn danger" id="clearCacheBtn">CLEAR CACHE</button>
-  </div>
-  <div class="progress-wrap">
-   <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
-   <div class="progress-text" id="progressText">Waiting for processing</div>
-  </div>
-  <div class="hint">
-   <strong style="color:var(--cyan)">DYNAMIC AREA SAMPLING</strong><br>
-   Sample points are generated inside the selected EA polygons.
-   Changing the region, district or ward rebuilds the sample grid.
-   Climate data must be loaded again after changing the selection.
-  </div>
-
-  <div class="section-label">DATA CONFIGURATION</div>
-  <div class="small-note">
-   Source: Open-Meteo Historical Weather API<br>
-   Model: ERA5-Land<br>
-   Variable: Daily maximum 2m air temperature<br>
-   Baseline: 1991–2020<br>
-   Time zone: Africa/Banjul<br>
-   Units: degrees Celsius
-  </div>
- </div>
-</aside>
+<!-- CENTRE: MAP -->
 
 <section class="panel map-panel">
- <div class="map-top">
-  <strong>02 / INTERACTIVE SPATIAL ATLAS</strong>
-  <div class="map-tools">
-   <select id="mapMode">
-    <option value="anomaly">Temperature anomaly</option>
-    <option value="temperature">Daily maximum temperature</option>
-   </select>
+
+  <div class="panel-heading">
+    <h2>02 / INTERACTIVE MAP</h2>
+    <span id="mapStatus">GAMBIA NATIONAL VIEW</span>
   </div>
- </div>
- <div id="map"></div>
- <div class="map-caption">
-  <span id="mapDate">NO OBSERVATION LOADED</span>
-  <span id="scanReadout">SPATIAL SCAN: STANDBY</span>
- </div>
- <div class="legend">
-  <span><i class="swatch" style="background:#ff626f"></i>Warmer than normal</span>
-  <span><i class="swatch" style="background:#4e91ff"></i>Cooler than normal</span>
-  <span><i class="swatch" style="background:#a4afbd"></i>Near normal</span>
-  <span><i class="swatch" style="background:#40d9ef"></i>Animated scan point</span>
- </div>
+
+  <div style="position:relative;flex:1;min-height:0">
+
+    <div id="map"></div>
+
+    <div class="map-tools">
+      <div class="map-tag"><strong>GBoS GEOAI</strong> / ENVIRONMENT ATLAS</div>
+      <div class="map-tag" id="scaleLabel">WGS84 • EPSG:4326</div>
+    </div>
+
+    <div class="map-footer">
+      THE GAMBIA • SPATIAL INTELLIGENCE
+    </div>
+
+    <div class="map-legend">
+      <strong>MAP LEGEND</strong>
+      <div class="legend-item"><span class="swatch" style="background:#4e9fff"></span> Buildings</div>
+      <div class="legend-item"><span class="swatch" style="background:#f4a340"></span> Roads</div>
+      <div class="legend-item"><span class="swatch" style="background:#31c48d"></span> Green spaces</div>
+      <div class="legend-item"><span class="swatch" style="background:#49d5d0"></span> Water</div>
+      <div class="legend-item"><span class="swatch" style="background:#ad91ff"></span> Industrial areas</div>
+      <div class="legend-item"><span class="swatch" style="background:#ffffff"></span> AOI boundary</div>
+    </div>
+
+  </div>
 </section>
 
-<aside class="panel analytics-panel">
- <div class="panel-heading"><span>03 / ANALYTICS</span><span style="color:var(--cyan)">LIVE SUMMARY</span></div>
- <div class="analytics-body">
-  <div class="insight" style="margin-top:0">
-   <h3>SELECTED GEOGRAPHIC AREA</h3>
-   <p id="selectedAreaLabel">National coverage • All regions / LGAs</p>
-   <p id="selectedAreaCoverage" style="margin-top:7px">EA boundary layer loading…</p>
+
+<!-- RIGHT: ANALYTICS -->
+
+<section class="panel">
+
+  <div class="panel-heading">
+    <h2>03 / ANALYTICS CENTRE</h2>
+    <span>LIVE STATISTICS</span>
   </div>
-  <div class="kpi-grid">
-   <div class="kpi"><div class="kpi-label">MEAN ANOMALY</div><div class="kpi-value" id="meanAnomaly">—</div><div class="kpi-unit">°C across sample grid</div></div>
-   <div class="kpi"><div class="kpi-label">MEAN MAX TEMP.</div><div class="kpi-value" id="meanTemp">—</div><div class="kpi-unit">°C daily maximum</div></div>
-   <div class="kpi"><div class="kpi-label">WARMER LOCATIONS</div><div class="kpi-value" id="warmCount">—</div><div class="kpi-unit">above +0.2°C</div></div>
-   <div class="kpi"><div class="kpi-label">COOLER LOCATIONS</div><div class="kpi-value" id="coolCount">—</div><div class="kpi-unit">below −0.2°C</div></div>
-   <div class="kpi"><div class="kpi-label">SAMPLE LOCATIONS</div><div class="kpi-value" id="sampleCount">30</div><div class="kpi-unit">inside selected area</div></div>
-   <div class="kpi"><div class="kpi-label">OBSERVATION DATE</div><div class="kpi-value" id="dayNumber">—</div><div class="kpi-unit">day of season</div></div>
+
+  <div class="panel-body">
+
+    <div class="section">
+      <div class="section-title">Environmental indicators</div>
+
+      <div class="kpis">
+
+        <div class="kpi">
+          <div class="name">Mapped buildings</div>
+          <div class="value" id="kBuildings">0</div>
+          <div class="unit">Features</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Road network</div>
+          <div class="value" id="kRoads">0.00</div>
+          <div class="unit">Kilometres</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Green-space area</div>
+          <div class="value" id="kGreen">0.00</div>
+          <div class="unit">Square kilometres</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Water area</div>
+          <div class="value" id="kWater">0.00</div>
+          <div class="unit">Square kilometres</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Industrial features</div>
+          <div class="value" id="kIndustry">0</div>
+          <div class="unit">Features</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Uploaded vector features</div>
+          <div class="value" id="kEnvironmental">0</div>
+          <div class="unit">Features</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">CSV observations</div>
+          <div class="value" id="kCSV">0</div>
+          <div class="unit">Points</div>
+        </div>
+
+        <div class="kpi">
+          <div class="name">Total displayed features</div>
+          <div class="value" id="kTotal">0</div>
+          <div class="unit">Features</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Spatial distribution</div>
+
+      <div class="chart-box">
+        <div class="chart-title">Environmental feature composition</div>
+        <canvas id="compositionChart"></canvas>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-title">Feature counts by category</div>
+        <canvas id="countChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Uploaded environmental attributes</div>
+
+      <div class="chart-box">
+        <div class="chart-title">Numeric attribute distribution</div>
+        <canvas id="attributeChart"></canvas>
+        <div class="small" id="attributeNote">
+          Upload vector data with numeric attributes to populate this chart.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Raster information</div>
+
+      <div class="kpi">
+        <div class="name">Raster status</div>
+        <div class="value" style="font-size:15px" id="rasterStatus">NOT LOADED</div>
+        <div class="unit" id="rasterDetails">Upload GeoTIFF to visualize raster data.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Data summary</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Features</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="dataTable"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Interpretation</div>
+      <div class="message" id="interpretation">
+        Upload or retrieve spatial datasets to begin environmental analysis.
+      </div>
+    </div>
+
+    <footer>
+      <strong>GAMBIA BUREAU OF STATISTICS (GBoS)</strong><br>
+      GIS / CARTOGRAPHY UNIT<br>
+      Produced by Ansu Singhateh<br>
+      GBoS GEOAI • Research and educational use
+    </footer>
+
   </div>
-  <div class="chart-wrap"><div class="chart-title">SPATIAL ANOMALY DISTRIBUTION</div><canvas id="anomalyChart"></canvas></div>
-  <div class="chart-wrap"><div class="chart-title">DAILY MEAN ANOMALY TREND</div><canvas id="trendChart"></canvas></div>
-  <div class="insight"><h3>SPATIAL INTERPRETATION</h3><p id="insightText">Load the climate dataset to calculate temperature anomalies.</p></div>
-  <div class="insight">
-   <h3>METHOD & LIMITATIONS</h3>
-   <p>Anomaly = daily ERA5-Land maximum temperature minus the 1991–2020 mean for the same calendar day. Sample locations are dynamically generated within the selected EA polygons. They do not represent a continuous high-resolution temperature surface. This is a model-based screening product, not an official GMet bulletin.</p>
-  </div>
- </div>
-</aside>
 </section>
 
-<section class="timeline">
- <div class="timeline-head"><strong>04 / DAILY TEMPORAL EXPLORER</strong><span class="date-readout" id="timelineDate">NO DATA</span></div>
- <input type="range" id="daySlider" min="0" max="0" value="0" disabled>
- <div class="timeline-controls">
-  <button class="btn" id="prevBtn" disabled>◀ PREVIOUS</button>
-  <button class="btn primary" id="playBtn" disabled>▶ PLAY</button>
-  <button class="btn" id="nextBtn" disabled>NEXT ▶</button>
-  <select id="speedSelect"><option value="1200">Slow playback</option><option value="700" selected>Normal playback</option><option value="300">Fast playback</option></select>
-  <button class="btn" id="scanBtn">START SPATIAL SCAN</button>
- </div>
- <div class="timeline-bottom">
-  <span id="rangeStart">START: —</span><span>DAILY OBSERVATION INTERVAL</span><span id="rangeEnd">END: —</span>
- </div>
-</section>
-
-<footer>
- <div>Produced by Ansu Singhateh | GIS Analyst | GIS / Cartography Unit | Gambia Bureau of Statistics (GBoS)<br>SILKYSINGZ GEOAI • Research and educational use</div>
- <div>ERA5-Land • Open-Meteo Historical Weather API • Leaflet • Chart.js</div>
-</footer>
 </main>
+
 
 <script>
 "use strict";
 
-/* ==========================================================
-   1. CONFIGURATION AND STATE
-========================================================== */
+/* =========================================================
+   1. MAP INITIALIZATION
+========================================================= */
 
-const API="https://archive-api.open-meteo.com/v1/archive";
-const EA_URL="https://raw.githubusercontent.com/silkysingz94-oss/Gambia-Daily-Temperature-Anomaly-Atlas/main/Census_EAs_Geo.json";
+const GAMBIA_CENTER = [13.45, -15.45];
 
-const PERIODS=[
- [1991,1995],[1996,2000],[2001,2005],
- [2006,2010],[2011,2015],[2016,2020]
-];
-
-const CACHE_PREFIX="gbos_dynamic_era5_v5";
-
-let eaGeoJSON=null;
-let eaLayer=null;
-let locations=[];
-let baselineNormals=null;
-let seasonData=[];
-let currentFrame=0;
-let isLoading=false;
-let playbackTimer=null;
-let scanTimer=null;
-let scanIndex=-1;
-let scanTrail=[];
-let markerLayers=[];
-let scanMarker=null;
-let scanTrailLine=null;
-let scanRouteLine=null;
-let currentBasemap=null;
-let anomalyChart=null;
-let trendChart=null;
-let selectedAreaFeatures=[];
-let currentAreaKey="NATIONAL";
-
-const $=id=>document.getElementById(id);
-const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-
-/* ==========================================================
-   2. MAP
-========================================================== */
-
-const map=L.map("map",{zoomControl:true,preferCanvas:true})
- .setView([13.43,-15.55],8);
-
-const baseLayers={
- dark:L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO",maxZoom:19}),
- street:L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors",maxZoom:19}),
- satellite:L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Tiles © Esri",maxZoom:19}),
- terrain:L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{attribution:"© OpenTopoMap © OpenStreetMap contributors",maxZoom:17})
-};
-
-function changeBasemap(name){
- if(currentBasemap)map.removeLayer(currentBasemap);
- currentBasemap=baseLayers[name]||baseLayers.dark;
- currentBasemap.addTo(map);
-}
-changeBasemap("dark");
-
-$("baseSelect").addEventListener("change",e=>changeBasemap(e.target.value));
-
-scanRouteLine=L.polyline([],{color:"#40d9ef",weight:1.2,opacity:.5,dashArray:"4 7"}).addTo(map);
-scanTrailLine=L.polyline([],{color:"#40d9ef",weight:3,opacity:.85}).addTo(map);
-
-const scanIcon=L.divIcon({
- className:"",
- html:'<div class="scan-marker"></div>',
- iconSize:[18,18],
- iconAnchor:[9,9]
+const map = L.map("map", {
+  center: GAMBIA_CENTER,
+  zoom: 8,
+  zoomControl: true,
+  preferCanvas: true
 });
 
-scanMarker=L.marker([13.43,-15.55],{icon:scanIcon,zIndexOffset:1000}).addTo(map);
-scanMarker.bindPopup("Dynamic sample-grid scan");
+const baseLayers = {
 
-/* ==========================================================
-   3. GEOGRAPHIC HELPERS
-========================================================== */
+  street: L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom:19,
+      attribution:"© OpenStreetMap contributors"
+    }
+  ),
 
-function uniqueValues(values){
- return [...new Set(values.filter(v=>v!==null&&v!==undefined&&String(v).trim()!=="").map(String))]
- .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-}
+  satellite: L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom:19,
+      attribution:"© Esri"
+    }
+  ),
 
-function fillSelect(id,values,label){
- const s=$(id);
- s.innerHTML="";
- const option=document.createElement("option");
- option.value="ALL";
- option.textContent=label;
- s.appendChild(option);
+  hybrid: L.layerGroup([
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      {maxZoom:19}
+    ),
+    L.tileLayer(
+      "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      {maxZoom:19}
+    )
+  ]),
 
- values.forEach(v=>{
-  const o=document.createElement("option");
-  o.value=v;
-  o.textContent=v;
-  s.appendChild(o);
- });
- s.value="ALL";
-}
+  terrain: L.tileLayer(
+    "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom:17,
+      attribution:"© OpenTopoMap"
+    }
+  )
+};
 
-function areaBounds(f){
- let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+let currentBasemap = "street";
+baseLayers.street.addTo(map);
 
- function walk(x){
-  if(!Array.isArray(x))return;
-  if(typeof x[0]==="number"){
-   minX=Math.min(minX,x[0]);
-   maxX=Math.max(maxX,x[0]);
-   minY=Math.min(minY,x[1]);
-   maxY=Math.max(maxY,x[1]);
-  }else x.forEach(walk);
- }
+document.getElementById("basemap").addEventListener("change", e => {
 
- walk(f.geometry?.coordinates||[]);
- return {minX,minY,maxX,maxY};
-}
-
-function inRing(point,ring){
- let inside=false;
- for(let i=0,j=ring.length-1;i<ring.length;j=i++){
-  const xi=ring[i][0],yi=ring[i][1];
-  const xj=ring[j][0],yj=ring[j][1];
-
-  if((yi>point[1])!==(yj>point[1]) &&
-     point[0]<(xj-xi)*(point[1]-yi)/(yj-yi||1e-30)+xi){
-   inside=!inside;
-  }
- }
- return inside;
-}
-
-function inEA(point,feature){
- const geometry=feature.geometry;
- if(!geometry)return false;
-
- const polygons=geometry.type==="Polygon"
-  ?[geometry.coordinates]
-  :geometry.type==="MultiPolygon"
-   ?geometry.coordinates:[];
-
- return polygons.some(poly=>{
-  if(!poly.length||!inRing(point,poly[0]))return false;
-  return !poly.slice(1).some(hole=>inRing(point,hole));
- });
-}
-
-function areaDescription(){
- const r=$("regionSelect").value;
- const d=$("districtSelect").value;
- const w=$("wardSelect").value;
-
- if(w!=="ALL")return w+" Ward";
- if(d!=="ALL")return d+" District";
- if(r!=="ALL")return r+" Region / LGA";
- return "National coverage • All regions / LGAs";
-}
-
-function getSelectedFeatures(){
- const r=$("regionSelect").value;
- const d=$("districtSelect").value;
- const w=$("wardSelect").value;
-
- return eaGeoJSON.features.filter(f=>{
-  const p=f.properties||{};
-  return (r==="ALL"||String(p.lganame)===r)&&
-         (d==="ALL"||String(p.distname)===d)&&
-         (w==="ALL"||String(p.wardname)===w);
- });
-}
-
-/* ==========================================================
-   4. DYNAMIC SAMPLE POINT GENERATION
-========================================================== */
-
-/*
- IMPORTANT:
- Each candidate point is tested against its actual EA polygon.
- Bounding boxes are used only to generate candidates.
- No point is accepted outside the selected polygons.
-*/
-
-function generatePointsInsideArea(features,count=30){
-
- if(!features.length)return [];
-
- const candidates=features.map(f=>({
-  feature:f,
-  bounds:areaBounds(f)
- })).filter(x=>
-  Number.isFinite(x.bounds.minX)&&
-  Number.isFinite(x.bounds.minY)&&
-  Number.isFinite(x.bounds.maxX)&&
-  Number.isFinite(x.bounds.maxY)&&
-  x.bounds.maxX>x.bounds.minX&&
-  x.bounds.maxY>x.bounds.minY
- );
-
- if(!candidates.length)return [];
-
- // Stable random seed: same selection produces repeatable points.
- const seedText=areaDescription()+"|"+features.length+"|"+count;
- let seed=2166136261;
-
- for(let i=0;i<seedText.length;i++){
-  seed^=seedText.charCodeAt(i);
-  seed=Math.imul(seed,16777619);
- }
-
- function random(){
-  seed+=0x6D2B79F5;
-  let t=seed;
-  t=Math.imul(t^(t>>>15),t|1);
-  t^=t+Math.imul(t^(t>>>7),t|61);
-  return ((t^(t>>>14))>>>0)/4294967296;
- }
-
- const points=[];
- let attempts=0;
-
- while(points.length<count&&attempts<1000000){
-
-  attempts++;
-
-  const item=candidates[Math.floor(random()*candidates.length)];
-  const b=item.bounds;
-
-  const lon=b.minX+random()*(b.maxX-b.minX);
-  const lat=b.minY+random()*(b.maxY-b.minY);
-
-  if(!inEA([lon,lat],item.feature))continue;
-
-  // Prefer spatially separated points.
-  const minDistance=0.004;
-
-  const separated=points.every(p=>{
-   const dx=(p.lon-lon)*Math.cos(lat*Math.PI/180);
-   const dy=p.lat-lat;
-   return Math.sqrt(dx*dx+dy*dy)>=minDistance;
+  Object.values(baseLayers).forEach(layer => {
+    if(map.hasLayer(layer)) map.removeLayer(layer);
   });
 
-  if(!separated&&attempts<500000)continue;
+  currentBasemap = e.target.value;
+  baseLayers[currentBasemap].addTo(map);
 
-  points.push({
-   id:points.length+1,
-   name:"Sample location "+String(points.length+1).padStart(2,"0"),
-   lat,
-   lon
-  });
- }
+});
 
- return points;
+
+/* =========================================================
+   2. MAP GROUPS AND APPLICATION STATE
+========================================================= */
+
+const groups = {
+
+  admin:L.geoJSON(null,{
+    style:{
+      color:"#ffffff",
+      weight:1.4,
+      fillColor:"#3b82f6",
+      fillOpacity:.035
+    }
+  }),
+
+  buildings:L.geoJSON(null,{
+    style:{
+      color:"#4e9fff",
+      weight:.5,
+      fillColor:"#4e9fff",
+      fillOpacity:.55
+    }
+  }),
+
+  roads:L.geoJSON(null,{
+    style:{
+      color:"#f4a340",
+      weight:2
+    }
+  }),
+
+  green:L.geoJSON(null,{
+    style:{
+      color:"#31c48d",
+      weight:1,
+      fillColor:"#31c48d",
+      fillOpacity:.35
+    }
+  }),
+
+  water:L.geoJSON(null,{
+    style:{
+      color:"#49d5d0",
+      weight:1,
+      fillColor:"#49d5d0",
+      fillOpacity:.45
+    }
+  }),
+
+  industry:L.geoJSON(null,{
+    style:{
+      color:"#ad91ff",
+      weight:1,
+      fillColor:"#ad91ff",
+      fillOpacity:.4
+    }
+  }),
+
+  environmental:L.geoJSON(null,{
+    style:{
+      color:"#ffca68",
+      weight:1,
+      fillColor:"#ffca68",
+      fillOpacity:.35
+    }
+  }),
+
+  csv:L.layerGroup(),
+  raster:L.layerGroup()
+};
+
+Object.values(groups).forEach(g => g.addTo(map));
+
+
+const state = {
+
+  admin:null,
+  adminFeatures:[],
+
+  environmental:[],
+
+  osm:{
+    buildings:[],
+    roads:[],
+    green:[],
+    water:[],
+    industry:[]
+  },
+
+  csvFeatures:[],
+  csvCount:0,
+
+  rasterLayer:null,
+  raster:null,
+
+  charts:{},
+
+  filteredAdmin:[]
+
+};
+
+
+// FILTERED DATA: ALL ANALYTICS USE THESE ARRAYS.
+
+let filteredData = {
+
+  buildings:[],
+  roads:[],
+  green:[],
+  water:[],
+  industry:[],
+  environmental:[],
+  csv:[]
+
+};
+
+
+let adminFields = {
+  region:null,
+  district:null,
+  ward:null
+};
+
+
+function setNotice(message){
+  document.getElementById("notice").textContent = message;
 }
 
-/* ==========================================================
-   5. MARKER REBUILD
-========================================================== */
-
-function rebuildSampleLayers(){
-
- markerLayers.forEach(m=>{
-  if(map.hasLayer(m))map.removeLayer(m);
- });
-
- markerLayers=[];
-
- locations.forEach(p=>{
-  const marker=L.circleMarker([p.lat,p.lon],{
-   radius:6,
-   color:"#dce6f1",
-   weight:1,
-   fillColor:"#7e8b9a",
-   fillOpacity:.9
-  }).addTo(map);
-
-  marker.bindPopup(
-   `<strong>${p.name}</strong><br>`+
-   `Latitude: ${p.lat.toFixed(5)}<br>`+
-   `Longitude: ${p.lon.toFixed(5)}<br>`+
-   `Location generated inside selected EA polygon`
-  );
-
-  markerLayers.push(marker);
- });
-
- scanRouteLine.setLatLngs(locations.map(p=>[p.lat,p.lon]));
- scanTrail=[];
- scanIndex=-1;
- scanTrailLine.setLatLngs([]);
-
- if(locations.length){
-  scanMarker.setLatLng([locations[0].lat,locations[0].lon]);
- }
+function safeText(v){
+  return v===null || v===undefined ? "" : String(v).trim();
 }
 
-/* ==========================================================
-   6. AREA SELECTORS AND FILTERING
-========================================================== */
+function featuresOf(data){
 
-function updateDistricts(){
- const r=$("regionSelect").value;
- const features=eaGeoJSON.features.filter(f=>
-  r==="ALL"||String(f.properties?.lganame)===r
- );
+  if(data.type==="FeatureCollection") return data.features || [];
 
- fillSelect("districtSelect",
-  uniqueValues(features.map(f=>f.properties?.distname)),
-  "All districts"
- );
+  if(data.type==="Feature") return [data];
 
- updateWards();
+  return [];
+
 }
 
-function updateWards(){
- const r=$("regionSelect").value;
- const d=$("districtSelect").value;
+function normalizeName(v){
 
- const features=eaGeoJSON.features.filter(f=>{
-  const p=f.properties||{};
-  return (r==="ALL"||String(p.lganame)===r)&&
-         (d==="ALL"||String(p.distname)===d);
- });
+  return safeText(v)
+    .toLowerCase()
+    .replace(/[_-]/g," ")
+    .trim();
 
- fillSelect("wardSelect",
-  uniqueValues(features.map(f=>f.properties?.wardname)),
-  "All wards"
- );
 }
 
-function invalidateClimateData(){
- stopPlayback();
- stopScan();
+function propertyKey(properties,candidates){
 
- seasonData=[];
- baselineNormals=null;
- currentFrame=0;
+  const keys = Object.keys(properties || {});
 
- $("daySlider").value=0;
- $("daySlider").max=0;
- $("daySlider").disabled=true;
+  for(const candidate of candidates){
 
- $("prevBtn").disabled=true;
- $("nextBtn").disabled=true;
- $("playBtn").disabled=true;
- $("exportBtn").disabled=true;
-
- $("meanAnomaly").textContent="—";
- $("meanTemp").textContent="—";
- $("warmCount").textContent="—";
- $("coolCount").textContent="—";
- $("dayNumber").textContent="—";
-
- $("timelineDate").textContent="NO DATA";
- $("mapDate").textContent="NO OBSERVATION LOADED";
- $("scanReadout").textContent="SPATIAL SCAN: STANDBY";
-
- $("insightText").textContent=
-  "Load the climate dataset to calculate temperature anomalies for the selected area.";
-
- $("rangeStart").textContent="START: —";
- $("rangeEnd").textContent="END: —";
-
- $("progressBar").style.width="0%";
- $("progressText").textContent="Waiting for processing";
-
- if(anomalyChart){
-  anomalyChart.data.labels=locations.map(p=>String(p.id).padStart(2,"0"));
-  anomalyChart.data.datasets[0].data=locations.map(()=>null);
-  anomalyChart.update();
- }
-
- if(trendChart){
-  trendChart.data.labels=[];
-  trendChart.data.datasets[0].data=[];
-  trendChart.update();
- }
-
- markerLayers.forEach(m=>{
-  m.setStyle({fillColor:"#7e8b9a",radius:6});
- });
-}
-
-function applyAreaFilter(){
-
- if(!eaGeoJSON)return;
-
- stopPlayback();
- stopScan();
-
- const features=getSelectedFeatures();
-
- selectedAreaFeatures=features;
-
- // Rebuild the geographic sample grid.
- const requestedCount=Number($("gridSelect").value)||30;
- locations=generatePointsInsideArea(features,requestedCount);
-
- currentAreaKey=[
-  $("regionSelect").value,
-  $("districtSelect").value,
-  $("wardSelect").value,
-  requestedCount
- ].join("|");
-
- // Climate data from the previous coordinates is no longer valid.
- invalidateClimateData();
-
- // Draw the selected administrative boundaries.
- if(eaLayer){
-  eaLayer.clearLayers();
-  eaLayer.addData({
-   type:"FeatureCollection",
-   features:features
-  });
- }
-
- rebuildSampleLayers();
-
- const label=areaDescription();
-
- $("selectedAreaLabel").textContent=label;
- $("sampleCount").textContent=locations.length;
-
- $("areaStatus").innerHTML=
-  "<strong>"+features.length.toLocaleString()+"</strong> EA polygons • "+
-  "<strong>"+locations.length+"</strong> generated points";
-
- if(!features.length){
-  $("selectedAreaCoverage").textContent="No EA polygons found for this selection.";
- }else if(!locations.length){
-  $("selectedAreaCoverage").textContent="No sample points could be generated. Check the selected GeoJSON geometry.";
- }else{
-  $("selectedAreaCoverage").textContent=
-   locations.length+" dynamically generated locations inside the selected EA polygons. Select LOAD CLIMATE DATA to process this area.";
- }
-
- if(eaLayer&&features.length){
-  const bounds=eaLayer.getBounds();
-  if(bounds.isValid())map.fitBounds(bounds.pad(.08),{maxZoom:12});
- }else{
-  map.setView([13.43,-15.55],8);
- }
-
- $("scanReadout").textContent="SPATIAL SCAN: STANDBY";
- $("statusText").textContent="AREA UPDATED • "+locations.length+" SAMPLE POINTS";
- $("statusDot").className="dot";
-
- updateCacheLabel();
-}
-
-/* ==========================================================
-   7. LOAD EA GEOJSON
-========================================================== */
-
-async function loadEABoundaries(){
-
- try{
-  $("areaStatus").textContent="Loading EA polygons…";
-
-  const response=await fetch(EA_URL,{cache:"force-cache"});
-  if(!response.ok)throw new Error("GitHub HTTP "+response.status);
-
-  eaGeoJSON=await response.json();
-
-  if(eaGeoJSON.type!=="FeatureCollection"||
-     !Array.isArray(eaGeoJSON.features)){
-   throw new Error("Invalid GeoJSON FeatureCollection.");
-  }
-
-  const lgas=uniqueValues(
-   eaGeoJSON.features.map(f=>f.properties?.lganame)
-  );
-
-  fillSelect("regionSelect",lgas,"All regions / LGAs");
-
-  eaLayer=L.geoJSON(null,{
-   renderer:L.canvas({padding:.4}),
-   style:()=>({
-    color:"#58cce5",
-    weight:.65,
-    opacity:.75,
-    fillColor:"#1a9bb4",
-    fillOpacity:.035
-   }),
-   onEachFeature:(f,l)=>{
-    const p=f.properties||{};
-    l.bindPopup(
-     "<strong>"+(p.eaname||"Enumeration Area")+"</strong><br>"+
-     "Region / LGA: "+(p.lganame||"—")+"<br>"+
-     "District: "+(p.distname||"—")+"<br>"+
-     "Ward: "+(p.wardname||"—")+"<br>"+
-     "EA code: "+(p.feacode||"—")
+    const match = keys.find(
+      k => normalizeName(k)===normalizeName(candidate)
     );
-   }
-  }).addTo(map);
 
-  $("regionSelect").addEventListener("change",()=>{
-   updateDistricts();
-   applyAreaFilter();
-  });
+    if(match) return match;
 
-  $("districtSelect").addEventListener("change",()=>{
-   updateWards();
-   applyAreaFilter();
-  });
-
-  $("wardSelect").addEventListener("change",applyAreaFilter);
-
-  $("resetAreaBtn").addEventListener("click",()=>{
-   fillSelect("regionSelect",lgas,"All regions / LGAs");
-   updateDistricts();
-   applyAreaFilter();
-  });
-
-  $("gridSelect").addEventListener("change",applyAreaFilter);
-
-  updateDistricts();
-  applyAreaFilter();
-
-  $("areaStatus").textContent=
-   eaGeoJSON.features.length.toLocaleString()+" EA polygons loaded";
-
-  setStatus("READY • EA boundaries loaded","ready");
-
- }catch(error){
-  console.error(error);
-  $("areaStatus").textContent="EA boundary error: "+error.message;
-  setStatus("EA BOUNDARY ERROR • "+error.message,"error");
- }
-}
-
-/* ==========================================================
-   8. STATUS AND PROGRESS
-========================================================== */
-
-function setStatus(message,type="ready"){
- $("statusText").textContent=message;
- $("statusDot").className="dot";
- if(type==="busy")$("statusDot").classList.add("busy");
- if(type==="error")$("statusDot").classList.add("error");
-}
-
-function setProgress(percent,message){
- $("progressBar").style.width=Math.max(0,Math.min(100,percent))+"%";
- $("progressText").textContent=message;
-}
-
-function updateCacheLabel(){
- const count=Object.keys(localStorage).filter(k=>k.startsWith(CACHE_PREFIX)).length;
- $("cacheStatus").textContent="LOCAL CACHE: "+count+" ENTRIES";
-}
-
-/* ==========================================================
-   9. API AND CACHE
-========================================================== */
-
-function coordinateSignature(){
- return locations.map(p=>p.lat.toFixed(5)+","+p.lon.toFixed(5)).join(";");
-}
-
-function cacheKey(type,extra){
- return CACHE_PREFIX+"_"+type+"_"+coordinateSignature().split(";").join("_")+"_"+extra;
-}
-
-function getCache(key){
- try{
-  const value=localStorage.getItem(key);
-  return value?JSON.parse(value):null;
- }catch(e){return null;}
-}
-
-function setCache(key,value){
- try{
-  localStorage.setItem(key,JSON.stringify(value));
-  return true;
- }catch(e){
-  console.warn("Cache storage unavailable",e);
-  return false;
- }
-}
-
-async function getJSON(url,maxAttempts=6){
-
- let lastError;
-
- for(let attempt=0;attempt<maxAttempts;attempt++){
-
-  try{
-   const controller=new AbortController();
-   const timeout=setTimeout(()=>controller.abort(),120000);
-
-   let response;
-
-   try{
-    response=await fetch(url,{
-     signal:controller.signal,
-     headers:{"Accept":"application/json"}
-    });
-   }finally{
-    clearTimeout(timeout);
-   }
-
-   if(response.ok)return await response.json();
-
-   if(![429,500,502,503,504].includes(response.status)){
-    throw new Error("Weather API HTTP "+response.status+": "+(await response.text()).slice(0,200));
-   }
-
-   const retryHeader=Number(response.headers.get("Retry-After"));
-   const delay=Math.max(
-    Number.isFinite(retryHeader)&&retryHeader>0?retryHeader*1000:0,
-    Math.min(10000*Math.pow(2,attempt),120000)
-   );
-
-   lastError=new Error("Weather API HTTP "+response.status);
-
-   setStatus("API BUSY • RETRY "+(attempt+1)+"/"+maxAttempts,"busy");
-   setProgress(5,"Waiting "+Math.round(delay/1000)+" seconds before retry");
-
-   if(attempt<maxAttempts-1)await sleep(delay);
-
-  }catch(error){
-   lastError=error.name==="AbortError"
-    ?new Error("Weather API request timed out.")
-    :error;
-
-   if(attempt<maxAttempts-1){
-    await sleep(Math.min(10000*Math.pow(2,attempt),120000));
-   }
   }
- }
 
- throw lastError||new Error("Weather API request failed.");
+  return null;
+
 }
 
-function buildURL(start,end,points){
- const p=new URLSearchParams();
- p.set("latitude",points.map(x=>x.lat).join(","));
- p.set("longitude",points.map(x=>x.lon).join(","));
- p.set("start_date",start);
- p.set("end_date",end);
- p.set("daily","temperature_2m_max");
- p.set("timezone","Africa/Banjul");
- p.set("models","era5_land");
- p.set("temperature_unit","celsius");
- return API+"?"+p.toString();
+
+/* =========================================================
+   3. ADMINISTRATIVE FIELD DETECTION
+========================================================= */
+
+const fieldCandidates = {
+
+  region:[
+    "region",
+    "regionname",
+    "rco",
+    "admin1",
+    "admin_1"
+  ],
+
+  district:[
+    "district",
+    "districtname",
+    "distname",
+    "lganame",
+    "admin2",
+    "admin_2"
+  ],
+
+  ward:[
+    "ward",
+    "wardname",
+    "admin3",
+    "admin_3"
+  ]
+
+};
+
+
+function detectAdminFields(feature){
+
+  const p = feature?.properties || {};
+
+  return {
+
+    region:propertyKey(p,fieldCandidates.region),
+
+    district:propertyKey(p,fieldCandidates.district),
+
+    ward:propertyKey(p,fieldCandidates.ward)
+
+  };
+
 }
 
-function normaliseResults(json){
- if(Array.isArray(json))return json;
- if(Array.isArray(json.results))return json.results;
- return [json];
+
+function uniqueValues(features,key){
+
+  if(!key) return [];
+
+  return [
+    ...new Set(
+      features
+        .map(f => safeText(f.properties?.[key]))
+        .filter(Boolean)
+    )
+  ].sort((a,b)=>a.localeCompare(b));
+
 }
 
-function validateResults(json,count){
- const results=normaliseResults(json);
 
- if(results.length!==count){
-  throw new Error("API returned "+results.length+" results; expected "+count+".");
- }
+function populateSelect(id,values,placeholder){
 
- results.forEach((x,i)=>{
-  if(!x.daily||!Array.isArray(x.daily.time)||
-     !Array.isArray(x.daily.temperature_2m_max)){
-   throw new Error("Missing daily temperature data for point "+(i+1));
-  }
- });
+  const el = document.getElementById(id);
+  const previous = el.value;
 
- return results;
+  el.innerHTML = "";
+
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = placeholder;
+
+  el.appendChild(first);
+
+  values.forEach(value => {
+
+    const opt = document.createElement("option");
+
+    opt.value = value;
+    opt.textContent = value;
+
+    el.appendChild(opt);
+
+  });
+
+  if(values.includes(previous)) el.value = previous;
+
 }
 
-/* Always use groups of ten to avoid oversized multi-location requests. */
 
-async function requestLocations(start,end){
+function updateAdminSelectors(){
 
- const all=[];
-
- for(let i=0;i<locations.length;i+=10){
-
-  const group=locations.slice(i,i+10);
-  const json=await getJSON(buildURL(start,end,group));
-  const results=validateResults(json,group.length);
-
-  all.push(...results);
-
-  setProgress(
-   10+((i+group.length)/locations.length)*20,
-   "Downloaded "+all.length+"/"+locations.length+" sample locations"
+  populateSelect(
+    "region",
+    uniqueValues(state.adminFeatures,adminFields.region),
+    "All regions"
   );
 
-  if(i+10<locations.length)await sleep(2500);
- }
+  updateDependentSelectors();
 
- return all;
 }
 
-/* ==========================================================
-   10. 1991–2020 BASELINE
-========================================================== */
 
-async function loadBaseline(){
+function updateDependentSelectors(){
 
- const key=cacheKey("baseline","1991_2020");
+  const r = document.getElementById("region").value;
+  const d = document.getElementById("district").value;
 
- const cached=getCache(key);
- if(cached){
-  console.info("Using coordinate-specific baseline cache");
-  return cached;
- }
+  let subset = state.adminFeatures;
 
- const accum=locations.map(()=>({}));
+  if(r && adminFields.region){
 
- for(let pi=0;pi<PERIODS.length;pi++){
+    subset = subset.filter(
+      f => safeText(f.properties?.[adminFields.region])===r
+    );
 
-  const [y1,y2]=PERIODS[pi];
-  const periodKey=cacheKey("period",y1+"_"+y2);
-
-  let results=getCache(periodKey);
-
-  if(!results){
-   setStatus("DOWNLOADING BASELINE "+y1+"–"+y2,"busy");
-   results=await requestLocations(y1+"-01-01",y2+"-12-31");
-   setCache(periodKey,results);
   }
 
-  results.forEach((result,locationIndex)=>{
-   const dates=result.daily.time;
-   const values=result.daily.temperature_2m_max;
+  populateSelect(
+    "district",
+    uniqueValues(subset,adminFields.district),
+    "All districts"
+  );
 
-   dates.forEach((date,i)=>{
-    const value=values[i];
-    if(value===null||value===undefined||!Number.isFinite(Number(value)))return;
+  if(d && adminFields.district){
 
-    const md=date.slice(5);
-    if(!accum[locationIndex][md]){
-     accum[locationIndex][md]={sum:0,count:0};
+    subset = subset.filter(
+      f => safeText(f.properties?.[adminFields.district])===d
+    );
+
+  }
+
+  populateSelect(
+    "ward",
+    uniqueValues(subset,adminFields.ward),
+    "All wards"
+  );
+
+}
+
+
+function selectedAdminFeatures(){
+
+  let fs = state.adminFeatures;
+
+  const r = document.getElementById("region").value;
+  const d = document.getElementById("district").value;
+  const w = document.getElementById("ward").value;
+
+  if(r && adminFields.region){
+
+    fs = fs.filter(
+      f => safeText(f.properties?.[adminFields.region])===r
+    );
+
+  }
+
+  if(d && adminFields.district){
+
+    fs = fs.filter(
+      f => safeText(f.properties?.[adminFields.district])===d
+    );
+
+  }
+
+  if(w && adminFields.ward){
+
+    fs = fs.filter(
+      f => safeText(f.properties?.[adminFields.ward])===w
+    );
+
+  }
+
+  return fs;
+
+}
+
+
+/* =========================================================
+   4. SELECTED AREA GEOMETRY
+========================================================= */
+
+// Creates a MultiPolygon representing the complete AOI.
+// No selection means national analysis.
+
+function getSelectedAOI(){
+
+  const features = selectedAdminFeatures().filter(f =>
+    f.geometry &&
+    ["Polygon","MultiPolygon"].includes(f.geometry.type)
+  );
+
+  if(!features.length) return null;
+
+  const coordinates = [];
+
+  features.forEach(f => {
+
+    if(f.geometry.type==="Polygon"){
+
+      coordinates.push(f.geometry.coordinates);
+
+    }else{
+
+      coordinates.push(...f.geometry.coordinates);
+
     }
 
-    accum[locationIndex][md].sum+=Number(value);
-    accum[locationIndex][md].count++;
-   });
   });
 
-  setProgress(
-   10+(pi+1)/PERIODS.length*30,
-   "Baseline climatology "+(pi+1)+"/"+PERIODS.length+" periods completed"
-  );
+  if(!coordinates.length) return null;
 
-  if(pi<PERIODS.length-1)await sleep(2500);
- }
+  return turf.multiPolygon(coordinates);
 
- const normals=accum.map(row=>{
-  const output={};
+}
 
-  Object.keys(row).forEach(md=>{
-   output[md]=row[md].count?row[md].sum/row[md].count:null;
+
+function insideAOI(point,aoi){
+
+  try{
+
+    return turf.booleanPointInPolygon(point,aoi);
+
+  }catch(e){
+
+    return false;
+
+  }
+
+}
+
+
+/* =========================================================
+   5. PRECISE SPATIAL CLIPPING ENGINE
+========================================================= */
+
+// Polygon and MultiPolygon intersections are calculated
+// using Turf.js. Lines are split at AOI boundaries.
+// Points outside the AOI are removed.
+
+function clipFeatureToAOI(feature,aoi){
+
+  if(!feature || !feature.geometry || !aoi) return [];
+
+  try{
+
+    const type = feature.geometry.type;
+
+    // POINTS
+
+    if(type==="Point"){
+
+      return insideAOI(feature,aoi) ? [feature] : [];
+
+    }
+
+
+    // MULTIPOINTS
+
+    if(type==="MultiPoint"){
+
+      const points = feature.geometry.coordinates.filter(c =>
+
+        insideAOI(turf.point(c),aoi)
+
+      );
+
+      return points.length ? [{
+        ...feature,
+        geometry:{
+          type:"MultiPoint",
+          coordinates:points
+        }
+      }] : [];
+
+    }
+
+
+    // POLYGONS: ACTUAL GEOMETRY INTERSECTION
+
+    if(type==="Polygon" || type==="MultiPolygon"){
+
+      const result = turf.intersect(
+        turf.featureCollection([feature,aoi])
+      );
+
+      if(!result) return [];
+
+      return [{
+        ...result,
+        properties:{...(feature.properties || {})}
+      }];
+
+    }
+
+
+    // LINESTRING / MULTILINESTRING
+    // Split against individual AOI boundary lines.
+
+    if(type==="LineString" || type==="MultiLineString"){
+
+      const inputLines = type==="LineString"
+        ? [feature.geometry.coordinates]
+        : feature.geometry.coordinates;
+
+      const output = [];
+
+      const boundary = turf.polygonToLine(aoi);
+
+      const boundaryLines = [];
+
+      turf.flattenEach(boundary, f => {
+
+        if(f.geometry.type==="LineString"){
+
+          boundaryLines.push(f);
+
+        }
+
+      });
+
+      inputLines.forEach(coords => {
+
+        if(!coords || coords.length<2) return;
+
+        let segments = [turf.lineString(coords)];
+
+        boundaryLines.forEach(boundaryLine => {
+
+          const nextSegments = [];
+
+          segments.forEach(segment => {
+
+            try{
+
+              const split = turf.lineSplit(segment,boundaryLine);
+
+              split.features.forEach(f => {
+
+                if(f.geometry.coordinates.length>=2){
+
+                  nextSegments.push(f);
+
+                }
+
+              });
+
+            }catch(e){
+
+              nextSegments.push(segment);
+
+            }
+
+          });
+
+          segments = nextSegments;
+
+        });
+
+
+        segments.forEach(segment => {
+
+          try{
+
+            const midpoint = turf.along(
+              segment,
+              turf.length(segment,{units:"kilometers"})/2,
+              {units:"kilometers"}
+            );
+
+            if(insideAOI(midpoint,aoi)){
+
+              output.push({
+
+                ...segment,
+
+                properties:{
+                  ...(feature.properties || {})
+                }
+
+              });
+
+            }
+
+          }catch(e){}
+
+        });
+
+      });
+
+      return output;
+
+    }
+
+  }catch(e){
+
+    console.warn("AOI clipping error:",e);
+
+  }
+
+  return [];
+
+}
+
+
+function filterFeaturesToAOI(features,aoi){
+
+  if(!aoi) return features.slice();
+
+  const output = [];
+
+  features.forEach(feature => {
+
+    const clipped = clipFeatureToAOI(feature,aoi);
+
+    output.push(...clipped);
+
   });
 
   return output;
- });
 
- setCache(key,normals);
- return normals;
 }
 
-/* ==========================================================
-   11. SEASONAL TEMPERATURE DATA
-========================================================== */
 
-async function loadSeason(year,start,end){
+/* =========================================================
+   6. SPATIAL FILTERING AND MAP REFRESH
+========================================================= */
 
- const key=cacheKey("season",year+"_"+start+"_"+end);
- const cached=getCache(key);
+function refreshSpatialLayers(){
 
- if(cached)return cached;
+  const aoi = getSelectedAOI();
 
- const results=await requestLocations(start,end);
+  const source = {
 
- if(!results.length)throw new Error("No climate data returned.");
+    buildings:state.osm.buildings,
+    roads:state.osm.roads,
+    green:state.osm.green,
+    water:state.osm.water,
+    industry:state.osm.industry,
+    environmental:state.environmental
 
- const dates=results[0].daily.time;
- const frames=[];
+  };
 
- dates.forEach((date,day)=>{
 
-  const frame={date,values:[]};
-  const md=date.slice(5);
+  // Filter every vector dataset.
 
-  results.forEach((result,locationIndex)=>{
+  Object.keys(source).forEach(key => {
 
-   const raw=result.daily.temperature_2m_max[day];
-   const temp=raw===null||raw===undefined?null:Number(raw);
-   const normal=baselineNormals[locationIndex]?.[md];
+    filteredData[key] = filterFeaturesToAOI(
+      source[key],
+      aoi
+    );
 
-   const anomaly=
-    temp!==null&&Number.isFinite(temp)&&
-    normal!==null&&normal!==undefined&&Number.isFinite(Number(normal))
-     ?temp-Number(normal):null;
-
-   frame.values.push({
-    temperature:temp,
-    normal:normal??null,
-    anomaly
-   });
   });
 
-  frames.push(frame);
- });
 
- setCache(key,frames);
- return frames;
-}
+  // Rebuild all filtered map layers.
 
-/* ==========================================================
-   12. CHARTS
-========================================================== */
+  [
+    "buildings",
+    "roads",
+    "green",
+    "water",
+    "industry",
+    "environmental"
+  ].forEach(key => {
 
-function average(values){
- const valid=values.filter(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v))).map(Number);
- return valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:null;
-}
+    groups[key].clearLayers();
 
-function fmt(value){
- return value===null||value===undefined||!Number.isFinite(Number(value))
-  ?"—":Number(value).toFixed(1);
-}
+    if(filteredData[key].length){
 
-function signed(value){
- if(value===null||value===undefined||!Number.isFinite(Number(value)))return "—";
- const n=Number(value);
- return (n>0?"+":"")+n.toFixed(2);
-}
+      groups[key].addData({
 
-function anomalyColour(v){
- if(v===null||!Number.isFinite(v))return "#7e8b9a";
- if(v>.2)return "#ff626f";
- if(v<-.2)return "#4e91ff";
- return "#a4afbd";
-}
+        type:"FeatureCollection",
 
-function temperatureColour(v){
- if(v===null||!Number.isFinite(v))return "#7e8b9a";
- if(v>=35)return "#ff626f";
- if(v>=32)return "#ff9e45";
- if(v>=29)return "#f3d36b";
- if(v>=26)return "#51d6a0";
- return "#4e91ff";
-}
+        features:filteredData[key]
 
-function initCharts(){
+      });
 
- anomalyChart=new Chart($("anomalyChart"),{
-  type:"bar",
-  data:{
-   labels:[],
-   datasets:[{
-    label:"Anomaly °C",
-    data:[],
-    backgroundColor:[],
-    borderWidth:0,
-    borderRadius:2
-   }]
-  },
-  options:{
-   responsive:true,
-   maintainAspectRatio:false,
-   plugins:{
-    legend:{display:false},
-    tooltip:{
-     callbacks:{
-      title:items=>locations[items[0].dataIndex]?.name||"",
-      label:item=>" "+signed(item.raw)+" °C"
-     }
     }
-   },
-   scales:{
-    x:{ticks:{color:"#8da1b8",font:{size:8},maxRotation:0},grid:{display:false}},
-    y:{ticks:{color:"#8da1b8",font:{size:9}},grid:{color:"rgba(141,161,184,.12)"}}
-   }
-  }
- });
 
- trendChart=new Chart($("trendChart"),{
-  type:"line",
-  data:{
-   labels:[],
-   datasets:[{
-    label:"Mean anomaly",
-    data:[],
-    borderColor:"#40d9ef",
-    backgroundColor:"rgba(64,217,239,.12)",
-    fill:true,
-    tension:.25,
-    pointRadius:0,
-    borderWidth:2
-   }]
-  },
-  options:{
-   responsive:true,
-   maintainAspectRatio:false,
-   plugins:{legend:{display:false}},
-   scales:{
-    x:{ticks:{color:"#8da1b8",font:{size:8},maxTicksLimit:6},grid:{display:false}},
-    y:{ticks:{color:"#8da1b8",font:{size:9}},grid:{color:"rgba(141,161,184,.12)"}}
-   }
-  }
- });
-}
-
-function updateCharts(frame){
-
- anomalyChart.data.labels=locations.map(p=>String(p.id).padStart(2,"0"));
- anomalyChart.data.datasets[0].data=frame.values.map(v=>v.anomaly);
- anomalyChart.data.datasets[0].backgroundColor=frame.values.map(v=>anomalyColour(v.anomaly));
- anomalyChart.update("none");
-
- const labels=[];
- const values=[];
-
- for(let i=0;i<=currentFrame;i++){
-  labels.push(seasonData[i].date.slice(5));
-  values.push(average(seasonData[i].values.map(v=>v.anomaly)));
- }
-
- trendChart.data.labels=labels;
- trendChart.data.datasets[0].data=values;
- trendChart.update("none");
-}
-
-/* ==========================================================
-   13. DISPLAY DAILY FRAME
-========================================================== */
-
-function createInsight(mean,warm,cool,normal,date){
-
- if(mean===null)return "No valid temperature observations are available.";
-
- let message="On "+date+", the mean sample-grid anomaly was "+signed(mean)+" °C. ";
-
- if(mean>.2){
-  message+="The sampled locations were, on average, warmer than their 1991–2020 calendar-day baseline. ";
- }else if(mean<-.2){
-  message+="The sampled locations were, on average, cooler than their 1991–2020 calendar-day baseline. ";
- }else{
-  message+="The mean sample-grid anomaly was close to the baseline normal. ";
- }
-
- return message+warm+" locations were warmer, "+cool+" cooler and "+normal+" near normal.";
-}
-
-function showFrame(index){
-
- if(!seasonData.length)return;
-
- currentFrame=Math.max(0,Math.min(index,seasonData.length-1));
-
- const frame=seasonData[currentFrame];
- const mode=$("mapMode").value;
-
- $("daySlider").value=currentFrame;
- $("timelineDate").textContent=frame.date;
- $("mapDate").textContent="OBSERVATION DATE: "+frame.date;
-
- const anomalies=[];
- const temperatures=[];
- let warm=0,cool=0,normal=0;
-
- frame.values.forEach((v,i)=>{
-
-  const marker=markerLayers[i];
-  if(!marker)return;
-
-  const anomaly=v.anomaly;
-  const temp=v.temperature;
-
-  if(anomaly!==null&&Number.isFinite(anomaly)){
-   anomalies.push(anomaly);
-   if(anomaly>.2)warm++;
-   else if(anomaly<-.2)cool++;
-   else normal++;
-  }
-
-  if(temp!==null&&Number.isFinite(temp))temperatures.push(temp);
-
-  const display=mode==="temperature"?temp:anomaly;
-  marker.setStyle({
-   fillColor:mode==="temperature"?temperatureColour(temp):anomalyColour(anomaly),
-   color:"#e7eef8",
-   radius:display===null?5:Math.max(5,Math.min(13,6+Math.abs(display)*2.2)),
-   fillOpacity:.9,
-   weight:1
   });
 
-  marker.setPopupContent(
-   "<strong>"+locations[i].name+"</strong><br>"+
-   "Date: "+frame.date+"<br>"+
-   "Latitude: "+locations[i].lat.toFixed(5)+"<br>"+
-   "Longitude: "+locations[i].lon.toFixed(5)+"<br>"+
-   "Daily maximum: "+fmt(temp)+" °C<br>"+
-   "Baseline normal: "+fmt(v.normal)+" °C<br>"+
-   "<strong>Temperature anomaly: "+signed(anomaly)+" °C</strong>"
-  );
- });
 
- const meanAnomaly=average(anomalies);
- const meanTemp=average(temperatures);
+  // CSV POINT FILTERING.
 
- $("meanAnomaly").textContent=signed(meanAnomaly);
- $("meanTemp").textContent=fmt(meanTemp);
- $("warmCount").textContent=warm;
- $("coolCount").textContent=cool;
- $("sampleCount").textContent=locations.length;
- $("dayNumber").textContent=currentFrame+1;
+  filteredData.csv = state.csvFeatures.filter(f =>
 
- $("insightText").textContent=
-  createInsight(meanAnomaly,warm,cool,normal,frame.date);
+    !aoi || insideAOI(f,aoi)
 
- updateCharts(frame);
- updateCacheLabel();
-}
-
-/* ==========================================================
-   14. PROCESSING WORKFLOW
-========================================================== */
-
-function validateDates(start,end,year){
-
- if(!start||!end)throw new Error("Select both observation dates.");
- if(start>end)throw new Error("Start date must be before end date.");
-
- if(!start.startsWith(String(year))||!end.startsWith(String(year))){
-  throw new Error("Both dates must belong to the selected year.");
- }
-
- const days=Math.round(
-  (new Date(end+"T00:00:00")-new Date(start+"T00:00:00"))/86400000
- )+1;
-
- if(days>200)throw new Error("Select a period of 200 days or fewer.");
-
- return days;
-}
-
-async function runAnalysis(){
-
- if(isLoading)return;
-
- if(!locations.length){
-  setStatus("NO SAMPLE LOCATIONS IN SELECTED AREA","error");
-  return;
- }
-
- const year=Number($("yearSelect").value);
- const start=$("startDate").value;
- const end=$("endDate").value;
-
- try{
-  validateDates(start,end,year);
- }catch(e){
-  setStatus(e.message,"error");
-  return;
- }
-
- isLoading=true;
- $("loadBtn").disabled=true;
- $("exportBtn").disabled=true;
-
- stopPlayback();
- stopScan();
-
- seasonData=[];
- currentFrame=0;
-
- try{
-
-  setStatus("BUILDING SELECTED-AREA CLIMATOLOGY","busy");
-  setProgress(2,"Preparing selected-area coordinates");
-
-  // New baseline is calculated for the current coordinate signature.
-  baselineNormals=await loadBaseline();
-
-  setProgress(45,"Baseline climatology ready");
-
-  setStatus("DOWNLOADING SEASONAL DATA","busy");
-
-  seasonData=await loadSeason(year,start,end);
-
-  if(!seasonData.length)throw new Error("No daily observations returned.");
-
-  $("daySlider").max=seasonData.length-1;
-  $("daySlider").value=0;
-  $("daySlider").disabled=false;
-
-  $("prevBtn").disabled=false;
-  $("nextBtn").disabled=false;
-  $("playBtn").disabled=false;
-  $("exportBtn").disabled=false;
-
-  $("rangeStart").textContent="START: "+seasonData[0].date;
-  $("rangeEnd").textContent="END: "+seasonData[seasonData.length-1].date;
-
-  showFrame(0);
-
-  setProgress(100,"Climate processing completed");
-  setStatus("READY • "+seasonData.length+" DAILY OBSERVATIONS","ready");
-
-  startScan();
-
- }catch(error){
-  console.error(error);
-  setStatus("CLIMATE DATA ERROR • "+error.message,"error");
-  $("progressText").textContent=error.message;
-
-  alert(
-   "Could not load climate data:\n\n"+error.message+
-   "\n\nPlease check your internet connection and try again."
   );
 
- }finally{
-  isLoading=false;
-  $("loadBtn").disabled=false;
- }
-}
+  groups.csv.clearLayers();
 
-/* ==========================================================
-   15. TIMELINE
-========================================================== */
+  filteredData.csv.forEach(f => {
 
-function stopPlayback(){
- if(playbackTimer){
-  clearInterval(playbackTimer);
-  playbackTimer=null;
- }
- $("playBtn").textContent="▶ PLAY";
-}
+    const coords = f.geometry.coordinates;
 
-function startPlayback(){
- if(!seasonData.length)return;
+    L.circleMarker(
+      [coords[1],coords[0]],
+      {
+        radius:5,
+        color:"#f4a340",
+        fillColor:"#f4a340",
+        fillOpacity:.85
+      }
+    ).bindPopup(
+      "<b>CSV observation</b><br>" +
+      Object.entries(f.properties || {})
+        .slice(0,12)
+        .map(([k,v]) =>
+          "<br>" + escapeHTML(k) + ": " + escapeHTML(v)
+        ).join("")
+    ).addTo(groups.csv);
 
- stopPlayback();
- $("playBtn").textContent="Ⅱ PAUSE";
-
- playbackTimer=setInterval(()=>{
-  if(currentFrame>=seasonData.length-1){
-   stopPlayback();
-   return;
-  }
-  showFrame(currentFrame+1);
- },Number($("speedSelect").value));
-}
-
-$("playBtn").addEventListener("click",()=>{
- playbackTimer?stopPlayback():startPlayback();
-});
-
-$("prevBtn").addEventListener("click",()=>{
- stopPlayback();
- showFrame(currentFrame-1);
-});
-
-$("nextBtn").addEventListener("click",()=>{
- stopPlayback();
- showFrame(currentFrame+1);
-});
-
-$("daySlider").addEventListener("input",e=>{
- stopPlayback();
- showFrame(Number(e.target.value));
-});
-
-$("speedSelect").addEventListener("change",()=>{
- if(playbackTimer)startPlayback();
-});
-
-$("mapMode").addEventListener("change",()=>{
- if(seasonData.length)showFrame(currentFrame);
-});
-
-/* ==========================================================
-   16. SPATIAL SCAN
-========================================================== */
-
-function advanceScan(){
-
- if(!locations.length)return;
-
- scanIndex=(scanIndex+1)%locations.length;
-
- const point=locations[scanIndex];
-
- scanMarker.setLatLng([point.lat,point.lon]);
-
- scanTrail.push([point.lat,point.lon]);
- if(scanTrail.length>locations.length)scanTrail.shift();
-
- scanTrailLine.setLatLngs(scanTrail);
-
- const value=seasonData.length
-  ?seasonData[currentFrame].values[scanIndex]:null;
-
- const anomaly=value?value.anomaly:null;
-
- $("scanReadout").textContent=
-  "SPATIAL SCAN: "+point.name.toUpperCase()+
-  " • ANOMALY "+signed(anomaly)+" °C";
-
- scanMarker.setPopupContent(
-  "<strong>Dynamic sample-grid scan</strong><br>"+
-  point.name+"<br>"+
-  "Location "+(scanIndex+1)+" of "+locations.length+"<br>"+
-  "Latitude: "+point.lat.toFixed(5)+"<br>"+
-  "Longitude: "+point.lon.toFixed(5)+"<br>"+
-  "Daily anomaly: "+signed(anomaly)+" °C"
- );
-}
-
-function startScan(){
- stopScan();
-
- if(!locations.length)return;
-
- scanIndex=-1;
- scanTrail=[];
- scanTrailLine.setLatLngs([]);
-
- scanTimer=setInterval(advanceScan,350);
- $("scanBtn").textContent="STOP SPATIAL SCAN";
-}
-
-function stopScan(){
- if(scanTimer){
-  clearInterval(scanTimer);
-  scanTimer=null;
- }
- $("scanBtn").textContent="START SPATIAL SCAN";
-}
-
-$("scanBtn").addEventListener("click",()=>{
- scanTimer?stopScan():startScan();
-});
-
-/* ==========================================================
-   17. CSV EXPORT
-========================================================== */
-
-function downloadCSV(){
-
- if(!seasonData.length)return;
-
- const rows=[[
-  "date","location_id","location_name",
-  "latitude","longitude",
-  "daily_max_temperature_c",
-  "baseline_1991_2020_c",
-  "temperature_anomaly_c",
-  "selected_area"
- ]];
-
- seasonData.forEach(frame=>{
-  frame.values.forEach((v,i)=>{
-   const p=locations[i];
-
-   rows.push([
-    frame.date,p.id,p.name,p.lat,p.lon,
-    v.temperature,v.normal,v.anomaly,
-    areaDescription()
-   ]);
   });
- });
 
- const csv=rows.map(row=>row.map(value=>{
-  if(value===null||value===undefined)return "";
-  return '"'+String(value).replace(/"/g,'""')+'"';
- }).join(",")).join("\n");
 
- const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
- const url=URL.createObjectURL(blob);
- const link=document.createElement("a");
+  // Raster handling:
+  // The uploaded raster is hidden while an AOI is selected.
+  // It is not displayed as if it had been clipped.
 
- link.href=url;
- link.download="GBoS_Gambia_Temperature_Anomaly_"+
-  $("yearSelect").value+".csv";
+  if(state.rasterLayer){
 
- document.body.appendChild(link);
- link.click();
- link.remove();
+    groups.raster.removeLayer(state.rasterLayer);
 
- setTimeout(()=>URL.revokeObjectURL(url),1000);
+    if(!aoi){
+
+      if(document.getElementById("showRaster").checked){
+
+        state.rasterLayer.addTo(groups.raster);
+
+      }
+
+      document.getElementById("rasterDetails").textContent =
+        "National raster display. No AOI mask applied.";
+
+    }else{
+
+      document.getElementById("rasterDetails").textContent =
+        "Raster hidden for AOI analysis. A clipped GeoTIFF is required for selected-area display.";
+
+    }
+
+  }
+
+
+  applyVisibility();
+
+  updateAnalytics();
+
+  updateDataTable();
+
+
+  document.getElementById("mapStatus").textContent =
+
+    aoi
+      ? "SELECTED AOI • " + filteredData.environmental.length +
+        " UPLOADED FEATURES"
+      : "GAMBIA NATIONAL VIEW";
+
 }
 
-$("exportBtn").addEventListener("click",downloadCSV);
 
-/* ==========================================================
-   18. RESET AND CACHE
-========================================================== */
+/* =========================================================
+   7. ADMINISTRATIVE MAP DISPLAY AND ZOOM
+========================================================= */
 
-function resetDashboard(){
- invalidateClimateData();
- setStatus("READY • Select LOAD CLIMATE DATA to begin","ready");
+function refreshAdmin(){
+
+  groups.admin.clearLayers();
+
+  const fs = selectedAdminFeatures();
+
+  state.filteredAdmin = fs;
+
+  if(fs.length){
+
+    groups.admin.addData({
+
+      type:"FeatureCollection",
+
+      features:fs
+
+    });
+
+  }
+
+  applyVisibility();
+
 }
 
-$("resetBtn").addEventListener("click",resetDashboard);
 
-$("clearCacheBtn").addEventListener("click",()=>{
+function zoomToSelection(){
 
- if(!confirm("Clear all cached ERA5-Land baseline and seasonal data?"))return;
+  const features = selectedAdminFeatures();
 
- Object.keys(localStorage).forEach(k=>{
-  if(k.startsWith(CACHE_PREFIX))localStorage.removeItem(k);
- });
+  if(!features.length){
 
- updateCacheLabel();
- alert("Climate cache cleared.");
+    map.setView(GAMBIA_CENTER,8);
+
+    return;
+
+  }
+
+  try{
+
+    const layer = L.geoJSON({
+
+      type:"FeatureCollection",
+
+      features
+
+    });
+
+    const bounds = layer.getBounds();
+
+    if(bounds.isValid()){
+
+      map.fitBounds(bounds,{
+        padding:[30,30],
+        maxZoom:15
+      });
+
+    }
+
+  }catch(e){
+
+    console.warn(e);
+
+  }
+
+}
+
+
+["region","district","ward"].forEach(id => {
+
+  document.getElementById(id).addEventListener("change",()=>{
+
+    if(id==="region"){
+
+      document.getElementById("district").value="";
+      document.getElementById("ward").value="";
+
+    }
+
+    if(id==="district"){
+
+      document.getElementById("ward").value="";
+
+    }
+
+    updateDependentSelectors();
+
+    refreshAdmin();
+
+    refreshSpatialLayers();
+
+    zoomToSelection();
+
+    const aoi = getSelectedAOI();
+
+    setNotice(
+      aoi
+        ? "Selected-area filtering applied. Outside features excluded."
+        : "National spatial view activated."
+    );
+
+  });
+
 });
 
-/* ==========================================================
-   19. YEAR CONFIGURATION
-========================================================== */
 
-function updateYearDates(){
- const year=$("yearSelect").value;
- $("startDate").value=year+"-06-01";
- $("endDate").value=year+"-10-10";
-}
+document.getElementById("zoomSelected").addEventListener(
+  "click",
+  zoomToSelection
+);
 
-$("yearSelect").addEventListener("change",()=>{
- updateYearDates();
- invalidateClimateData();
- setStatus("YEAR UPDATED • LOAD CLIMATE DATA","ready");
+
+document.getElementById("clearSelection").addEventListener("click",()=>{
+
+  ["region","district","ward"].forEach(id => {
+
+    document.getElementById(id).value="";
+
+  });
+
+  updateDependentSelectors();
+
+  refreshAdmin();
+
+  refreshSpatialLayers();
+
+  map.setView(GAMBIA_CENTER,8);
+
+  setNotice("Administrative selection cleared. National view restored.");
+
 });
 
-/* ==========================================================
-   20. STARTUP
-========================================================== */
 
-initCharts();
-updateCacheLabel();
-loadEABoundaries();
+/* =========================================================
+   8. FILE UPLOADS
+========================================================= */
 
-$("sampleCount").textContent="0";
-setProgress(0,"Waiting for processing");
-setStatus("LOADING ENUMERATION AREA BOUNDARIES","busy");
+async function readVectorFile(file){
+
+  const name = file.name.toLowerCase();
+
+  if(name.endsWith(".zip")){
+
+    const result = await shp(file);
+
+    if(result.type==="FeatureCollection") return result;
+
+    const collections = Object.values(result).filter(
+      x => x?.type==="FeatureCollection"
+    );
+
+    if(!collections.length){
+
+      throw new Error("No valid Shapefile layer found in ZIP.");
+
+    }
+
+    return {
+
+      type:"FeatureCollection",
+
+      features:collections.flatMap(x=>x.features || [])
+
+    };
+
+  }
+
+  const content = await file.text();
+
+  const data = JSON.parse(content);
+
+  if(!["FeatureCollection","Feature"].includes(data.type)){
+
+    throw new Error("File is not a valid GeoJSON Feature or FeatureCollection.");
+
+  }
+
+  return data;
+
+}
+
+
+/* ADMINISTRATIVE BOUNDARIES */
+
+document.getElementById("adminFile").addEventListener(
+  "change",
+  async e => {
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const data = await readVectorFile(file);
+
+      const features = featuresOf(data);
+
+      if(!features.length){
+
+        throw new Error("No features found.");
+
+      }
+
+      state.admin = data;
+
+      state.adminFeatures = features;
+
+      adminFields = detectAdminFields(features[0]);
+
+      if(!adminFields.region &&
+         !adminFields.district &&
+         !adminFields.ward){
+
+        throw new Error(
+          "Administrative fields not detected. Expected fields such as RCO, lganame, distname and wardname."
+        );
+
+      }
+
+      ["region","district","ward"].forEach(id => {
+
+        document.getElementById(id).value="";
+
+      });
+
+      updateAdminSelectors();
+
+      refreshAdmin();
+
+      refreshSpatialLayers();
+
+      zoomToSelection();
+
+      updateDataTable();
+
+      setNotice(
+        "Administrative data loaded: " +
+        features.length +
+        " features. Spatial filtering activated."
+      );
+
+    }catch(err){
+
+      alert("Administrative upload failed: " + err.message);
+
+    }
+
+  }
+);
+
+
+/* ENVIRONMENTAL VECTOR DATA */
+
+document.getElementById("vectorFile").addEventListener(
+  "change",
+  async e => {
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const data = await readVectorFile(file);
+
+      const fs = featuresOf(data);
+
+      if(!fs.length){
+
+        throw new Error("No vector features found.");
+
+      }
+
+      state.environmental = fs;
+
+      refreshSpatialLayers();
+
+      updateDataTable();
+
+      setNotice(
+        "Environmental vector loaded: " +
+        fs.length +
+        " source features. Selected-area filtering applied."
+      );
+
+    }catch(err){
+
+      alert("Vector upload failed: " + err.message);
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   9. CSV IMPORT
+========================================================= */
+
+function parseCSV(text){
+
+  const lines = text
+    .replace(/^\uFEFF/,"")
+    .split(/\r?\n/)
+    .filter(x=>x.trim());
+
+  if(lines.length<2) return [];
+
+  const parseLine = line => {
+
+    const out = [];
+
+    let value = "";
+    let quoted = false;
+
+    for(let i=0;i<line.length;i++){
+
+      const c = line[i];
+
+      if(c==='"' && line[i+1]==='"'){
+
+        value+='"';
+        i++;
+
+      }else if(c==='"'){
+
+        quoted=!quoted;
+
+      }else if(c==="," && !quoted){
+
+        out.push(value.trim());
+        value="";
+
+      }else{
+
+        value+=c;
+
+      }
+
+    }
+
+    out.push(value.trim());
+
+    return out;
+
+  };
+
+  const headers = parseLine(lines[0]).map(
+    x=>x.toLowerCase().trim()
+  );
+
+  return lines.slice(1).map(line=>{
+
+    const values = parseLine(line);
+
+    return Object.fromEntries(
+
+      headers.map((h,i)=>[h,values[i] ?? ""])
+
+    );
+
+  });
+
+}
+
+
+function findCoord(row,candidates){
+
+  for(const c of candidates){
+
+    if(row[c]!==undefined && row[c]!==""){
+
+      return Number(row[c]);
+
+    }
+
+  }
+
+  return NaN;
+
+}
+
+
+document.getElementById("csvFile").addEventListener(
+  "change",
+  async e => {
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const rows = parseCSV(await file.text());
+
+      state.csvFeatures = [];
+
+      rows.forEach(row=>{
+
+        const lat = findCoord(row,[
+          "latitude","lat","y"
+        ]);
+
+        const lon = findCoord(row,[
+          "longitude","lon","lng","long","x"
+        ]);
+
+        if(
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lon) ||
+          Math.abs(lat)>90 ||
+          Math.abs(lon)>180
+        ) return;
+
+        state.csvFeatures.push({
+
+          type:"Feature",
+
+          properties:row,
+
+          geometry:{
+            type:"Point",
+            coordinates:[lon,lat]
+          }
+
+        });
+
+      });
+
+      state.csvCount = state.csvFeatures.length;
+
+      refreshSpatialLayers();
+
+      updateDataTable();
+
+      setNotice(
+        "CSV imported: " +
+        state.csvCount +
+        " valid coordinate records. Only selected-area points displayed."
+      );
+
+    }catch(err){
+
+      alert("CSV import failed: " + err.message);
+
+    }
+
+  }
+);
+
+
+function escapeHTML(v){
+
+  return String(v).replace(/[&<>"']/g,c=>({
+
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+
+  }[c]));
+
+}
+
+
+/* =========================================================
+   10. GEOTIFF RASTER SUPPORT
+========================================================= */
+
+document.getElementById("rasterFile").addEventListener(
+  "change",
+  async e => {
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+      if(
+        typeof parseGeoraster!=="function" ||
+        typeof GeoRasterLayer==="undefined"
+      ){
+
+        throw new Error("Raster libraries did not load.");
+
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+
+      const raster = await parseGeoraster(arrayBuffer);
+
+      if(state.rasterLayer){
+
+        groups.raster.removeLayer(state.rasterLayer);
+
+      }
+
+      state.raster = raster;
+
+      state.rasterLayer = new GeoRasterLayer({
+
+        georaster:raster,
+
+        opacity:.72,
+
+        resolution:256,
+
+        pixelValuesToColorFn:values=>{
+
+          const v = values[0];
+
+          if(v===null || v===undefined || !Number.isFinite(v)){
+
+            return null;
+
+          }
+
+          if(
+            raster.noDataValue!==null &&
+            v===raster.noDataValue
+          ){
+
+            return null;
+
+          }
+
+          const min = raster.mins?.[0] ?? 0;
+
+          const max = raster.maxs?.[0] ?? 1;
+
+          const t = Math.max(
+            0,
+            Math.min(1,(v-min)/(max-min || 1))
+          );
+
+          const r = Math.round(30+220*t);
+          const g = Math.round(160-90*t);
+          const b = Math.round(210-170*t);
+
+          return "rgb("+r+","+g+","+b+")";
+
+        }
+
+      });
+
+      document.getElementById("rasterStatus").textContent="LOADED";
+
+      document.getElementById("rasterDetails").textContent=
+        "Bands: " + raster.numberOfRasters +
+        " | NoData: " + raster.noDataValue;
+
+      // Only show unmasked raster in national view.
+
+      refreshSpatialLayers();
+
+      if(!getSelectedAOI()){
+
+        const bounds = state.rasterLayer.getBounds();
+
+        if(bounds?.isValid()){
+
+          map.fitBounds(bounds,{padding:[20,20]});
+
+        }
+
+      }
+
+      setNotice(
+        "GeoTIFF loaded. Raster is displayed nationally only; it is hidden when an AOI is selected because no raster mask has been applied."
+      );
+
+    }catch(err){
+
+      alert("Raster upload failed: " + err.message);
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   11. OPENSTREETMAP FEATURE EXTRACTION
+========================================================= */
+
+function overpassToGeoJSON(data){
+
+  const features = [];
+
+  data.elements.forEach(el=>{
+
+    if(el.type==="node"){
+
+      if(!el.tags || !Object.keys(el.tags).length) return;
+
+      features.push({
+
+        type:"Feature",
+
+        id:el.id,
+
+        properties:el.tags,
+
+        geometry:{
+          type:"Point",
+          coordinates:[el.lon,el.lat]
+        }
+
+      });
+
+    }
+
+
+    if(el.type==="way" && el.geometry){
+
+      const coords = el.geometry.map(
+        p=>[p.lon,p.lat]
+      );
+
+      const closed =
+        coords.length>3 &&
+        coords[0][0]===coords[coords.length-1][0] &&
+        coords[0][1]===coords[coords.length-1][1];
+
+      const tags = el.tags || {};
+
+      const isArea = closed && (
+
+        tags.building ||
+        tags.leisure ||
+        tags.landuse ||
+        tags.natural==="water" ||
+        tags.natural==="wood" ||
+        tags.water
+
+      );
+
+      features.push({
+
+        type:"Feature",
+
+        id:el.id,
+
+        properties:tags,
+
+        geometry:isArea
+          ? {
+              type:"Polygon",
+              coordinates:[coords]
+            }
+          : {
+              type:"LineString",
+              coordinates:coords
+            }
+
+      });
+
+    }
+
+  });
+
+  return {
+
+    type:"FeatureCollection",
+
+    features
+
+  };
+
+}
+
+
+function classifyOSM(feature){
+
+  const p = feature.properties || {};
+
+  if(p.building) return "buildings";
+
+  if(p.highway) return "roads";
+
+  if(
+    p.leisure==="park" ||
+    p.leisure==="garden" ||
+    p.landuse==="grass" ||
+    p.landuse==="forest" ||
+    p.natural==="wood" ||
+    p.landuse==="meadow"
+  ) return "green";
+
+  if(
+    p.natural==="water" ||
+    p.water ||
+    p.waterway ||
+    p.landuse==="reservoir" ||
+    p.landuse==="basin"
+  ) return "water";
+
+  if(
+    p.landuse==="industrial" ||
+    p.industrial ||
+    p.commercial ||
+    p.landuse==="commercial"
+  ) return "industry";
+
+  return null;
+
+}
+
+
+document.getElementById("loadOSM").addEventListener(
+  "click",
+  async ()=>{
+
+    const button = document.getElementById("loadOSM");
+
+    const selectedAOI = getSelectedAOI();
+
+    let bounds;
+
+    if(selectedAOI){
+
+      bounds = L.geoJSON(selectedAOI).getBounds();
+
+    }else{
+
+      bounds = map.getBounds();
+
+    }
+
+    if(map.getZoom()<11 && !selectedAOI){
+
+      alert(
+        "Please zoom into an urban area or select an administrative area before loading OSM features."
+      );
+
+      return;
+
+    }
+
+    if(!bounds || !bounds.isValid()){
+
+      alert("Invalid extraction boundary.");
+
+      return;
+
+    }
+
+    const bbox = [
+
+      bounds.getSouth(),
+      bounds.getWest(),
+      bounds.getNorth(),
+      bounds.getEast()
+
+    ].join(",");
+
+
+    button.disabled = true;
+
+    button.textContent = "RETRIEVING OSM DATA...";
+
+
+    try{
+
+      const query = `
+[out:json][timeout:40];
+(
+  way["building"](${bbox});
+  way["highway"](${bbox});
+  way["leisure"](${bbox});
+  way["landuse"~"grass|forest|meadow|industrial|commercial|reservoir|basin"](${bbox});
+  way["natural"~"wood|water"](${bbox});
+  way["waterway"](${bbox});
+);
+out body geom;
+`;
+
+
+      const endpoints = [
+
+        "https://overpass-api.de/api/interpreter",
+
+        "https://overpass.kumi.systems/api/interpreter"
+
+      ];
+
+      let data = null;
+
+      let lastError = null;
+
+
+      for(const endpoint of endpoints){
+
+        try{
+
+          const response = await fetch(endpoint,{
+
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/x-www-form-urlencoded"
+            },
+
+            body:"data="+encodeURIComponent(query)
+
+          });
+
+          if(!response.ok){
+
+            throw new Error("HTTP " + response.status);
+
+          }
+
+          data = await response.json();
+
+          break;
+
+        }catch(err){
+
+          lastError = err;
+
+        }
+
+      }
+
+
+      if(!data){
+
+        throw lastError || new Error("No Overpass server responded.");
+
+      }
+
+
+      const geo = overpassToGeoJSON(data);
+
+
+      Object.keys(state.osm).forEach(k=>{
+
+        state.osm[k] = [];
+
+      });
+
+
+      geo.features.forEach(f=>{
+
+        const type = classifyOSM(f);
+
+        if(type){
+
+          state.osm[type].push(f);
+
+        }
+
+      });
+
+
+      // IMPORTANT: Apply AOI filtering before display and analysis.
+
+      refreshSpatialLayers();
+
+      updateDataTable();
+
+      setNotice(
+
+        "OSM retrieval complete. " +
+        geo.features.length +
+        " source features retrieved. Selected-area filtering applied."
+
+      );
+
+    }catch(err){
+
+      alert(
+        "OSM extraction failed: " +
+        err.message +
+        ". Try again later or use a smaller area."
+      );
+
+    }finally{
+
+      button.disabled = false;
+
+      button.textContent = "LOAD OSM ENVIRONMENTAL FEATURES";
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   12. LAYER VISIBILITY
+========================================================= */
+
+const visibility = {
+
+  admin:"showAdmin",
+  buildings:"showBuildings",
+  roads:"showRoads",
+  green:"showGreen",
+  water:"showWater",
+  industry:"showIndustry",
+  environmental:"showEnvironmental",
+  csv:"showCSV",
+  raster:"showRaster"
+
+};
+
+
+function applyVisibility(){
+
+  Object.entries(visibility).forEach(([group,id])=>{
+
+    const visible = document.getElementById(id).checked;
+
+    if(visible){
+
+      if(group==="raster"){
+
+        if(!getSelectedAOI() && state.rasterLayer){
+
+          groups.raster.addLayer(state.rasterLayer);
+
+        }
+
+      }else{
+
+        if(!map.hasLayer(groups[group])){
+
+          groups[group].addTo(map);
+
+        }
+
+      }
+
+    }else{
+
+      if(map.hasLayer(groups[group])){
+
+        map.removeLayer(groups[group]);
+
+      }
+
+    }
+
+  });
+
+}
+
+
+Object.values(visibility).forEach(id=>{
+
+  document.getElementById(id).addEventListener(
+    "change",
+    applyVisibility
+  );
+
+});
+
+
+/* =========================================================
+   13. ENVIRONMENTAL ANALYTICS
+========================================================= */
+
+function formatNumber(value,digits=2){
+
+  return Number.isFinite(value)
+    ? value.toLocaleString("en-US",{
+        minimumFractionDigits:digits,
+        maximumFractionDigits:digits
+      })
+    : "0";
+
+}
+
+
+function areaKm2(features){
+
+  let total = 0;
+
+  features.forEach(f=>{
+
+    try{
+
+      if(
+        ["Polygon","MultiPolygon"].includes(f.geometry?.type)
+      ){
+
+        total += turf.area(f)/1000000;
+
+      }
+
+    }catch(e){}
+
+  });
+
+  return total;
+
+}
+
+
+function lengthKm(features){
+
+  let total = 0;
+
+  features.forEach(f=>{
+
+    try{
+
+      if(
+        ["LineString","MultiLineString"].includes(f.geometry?.type)
+      ){
+
+        total += turf.length(
+          f,
+          {units:"kilometers"}
+        );
+
+      }
+
+    }catch(e){}
+
+  });
+
+  return total;
+
+}
+
+
+function countGeometry(features,types){
+
+  return features.filter(
+    f=>types.includes(f.geometry?.type)
+  ).length;
+
+}
+
+
+function getAttributeSummary(){
+
+  const fs = filteredData.environmental;
+
+  if(!fs.length) return null;
+
+  const numericKeys = {};
+
+  fs.slice(0,1000).forEach(f=>{
+
+    Object.entries(f.properties || {}).forEach(([key,value])=>{
+
+      if(
+        value!=="" &&
+        value!==null &&
+        Number.isFinite(Number(value))
+      ){
+
+        numericKeys[key] = (numericKeys[key] || 0)+1;
+
+      }
+
+    });
+
+  });
+
+
+  const key = Object.keys(numericKeys).sort(
+    (a,b)=>numericKeys[b]-numericKeys[a]
+  )[0];
+
+  if(!key) return null;
+
+  const values = fs
+    .map(f=>Number(f.properties?.[key]))
+    .filter(Number.isFinite);
+
+  if(!values.length) return null;
+
+  return {key,values};
+
+}
+
+
+function updateAnalytics(){
+
+  // All indicators are based on filtered data.
+
+  const buildings = filteredData.buildings;
+  const roads = filteredData.roads;
+  const green = filteredData.green;
+  const water = filteredData.water;
+  const industry = filteredData.industry;
+  const environmental = filteredData.environmental;
+  const csv = filteredData.csv;
+
+
+  const buildingCount = countGeometry(
+    buildings,
+    ["Polygon","MultiPolygon","Point"]
+  );
+
+  const roadLength = lengthKm(roads);
+
+  const greenArea = areaKm2(green);
+
+  const waterArea = areaKm2(water);
+
+  const total =
+
+    buildings.length +
+    roads.length +
+    green.length +
+    water.length +
+    industry.length +
+    environmental.length +
+    csv.length;
+
+
+  document.getElementById("kBuildings").textContent =
+    buildingCount.toLocaleString();
+
+  document.getElementById("kRoads").textContent =
+    formatNumber(roadLength);
+
+  document.getElementById("kGreen").textContent =
+    formatNumber(greenArea);
+
+  document.getElementById("kWater").textContent =
+    formatNumber(waterArea);
+
+  document.getElementById("kIndustry").textContent =
+    industry.length.toLocaleString();
+
+  document.getElementById("kEnvironmental").textContent =
+    environmental.length.toLocaleString();
+
+  document.getElementById("kCSV").textContent =
+    csv.length.toLocaleString();
+
+  document.getElementById("kTotal").textContent =
+    total.toLocaleString();
+
+
+  updateCharts({
+
+    buildings:buildings.length,
+    roads:roads.length,
+    green:green.length,
+    water:water.length,
+    industry:industry.length,
+    environmental:environmental.length,
+    csv:csv.length
+
+  });
+
+
+  updateAttributeChart();
+
+  updateInterpretation({
+
+    buildingCount,
+    roadLength,
+    greenArea,
+    waterArea,
+    industryCount:industry.length,
+    environmentalCount:environmental.length,
+    csvCount:csv.length
+
+  });
+
+}
+
+
+/* =========================================================
+   14. INTERPRETATION
+========================================================= */
+
+function updateInterpretation(s){
+
+  const lines = [];
+
+  const selected = getSelectedAOI();
+
+  const region = document.getElementById("region").value;
+  const district = document.getElementById("district").value;
+  const ward = document.getElementById("ward").value;
+
+  let selection = "The Gambia national view";
+
+  if(ward) selection = "Selected ward: " + ward;
+  else if(district) selection = "Selected district: " + district;
+  else if(region) selection = "Selected region: " + region;
+
+
+  lines.push(selection + ".");
+
+  if(!s.buildingCount && !s.roadLength &&
+     !s.greenArea && !s.waterArea &&
+     !s.environmentalCount && !s.csvCount){
+
+    lines.push(
+      "No environmental observations are currently loaded."
+    );
+
+  }else{
+
+    lines.push(
+      "The analysed area contains " +
+      s.buildingCount +
+      " mapped building features and " +
+      formatNumber(s.roadLength) +
+      " km of mapped roads."
+    );
+
+    lines.push(
+      "Mapped green-space polygons cover " +
+      formatNumber(s.greenArea) +
+      " km², while mapped water polygons cover " +
+      formatNumber(s.waterArea) +
+      " km²."
+    );
+
+    lines.push(
+      "Industrial features: " +
+      s.industryCount +
+      ". Uploaded environmental features: " +
+      s.environmentalCount +
+      ". CSV observations: " +
+      s.csvCount +
+      "."
+    );
+
+  }
+
+  lines.push(
+    selected
+      ? "Spatial features outside the selected administrative geometry are excluded from vector display and analytics."
+      : "Statistics represent the available national datasets."
+  );
+
+  lines.push(
+    "These values describe mapped records, not complete environmental coverage or measured environmental quality."
+  );
+
+  document.getElementById("interpretation").textContent =
+    lines.join(" ");
+
+}
+
+
+/* =========================================================
+   15. CHARTS
+========================================================= */
+
+Chart.defaults.color = "#a9bdcc";
+Chart.defaults.font.family = "Manrope";
+Chart.defaults.font.size = 10;
+
+
+function destroyChart(key){
+
+  if(state.charts[key]){
+
+    state.charts[key].destroy();
+
+    state.charts[key] = null;
+
+  }
+
+}
+
+
+function updateCharts(data){
+
+  const labels = [
+    "Buildings",
+    "Roads",
+    "Green spaces",
+    "Water",
+    "Industry",
+    "Uploaded vectors",
+    "CSV points"
+  ];
+
+  const values = [
+    data.buildings,
+    data.roads,
+    data.green,
+    data.water,
+    data.industry,
+    data.environmental,
+    data.csv
+  ];
+
+  const colors = [
+    "#4e9fff",
+    "#f4a340",
+    "#31c48d",
+    "#49d5d0",
+    "#ad91ff",
+    "#ffca68",
+    "#ed8299"
+  ];
+
+
+  destroyChart("composition");
+
+  destroyChart("count");
+
+
+  state.charts.composition = new Chart(
+
+    document.getElementById("compositionChart"),
+
+    {
+
+      type:"doughnut",
+
+      data:{
+
+        labels,
+
+        datasets:[{
+
+          data:values,
+
+          backgroundColor:colors,
+
+          borderWidth:0
+
+        }]
+
+      },
+
+      options:{
+
+        responsive:true,
+
+        maintainAspectRatio:true,
+
+        plugins:{
+
+          legend:{
+
+            position:"bottom",
+
+            labels:{
+
+              boxWidth:9,
+
+              padding:10
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  );
+
+
+  state.charts.count = new Chart(
+
+    document.getElementById("countChart"),
+
+    {
+
+      type:"bar",
+
+      data:{
+
+        labels,
+
+        datasets:[{
+
+          label:"Mapped features",
+
+          data:values,
+
+          backgroundColor:colors,
+
+          borderRadius:4
+
+        }]
+
+      },
+
+      options:{
+
+        responsive:true,
+
+        maintainAspectRatio:true,
+
+        plugins:{
+
+          legend:{display:false}
+
+        },
+
+        scales:{
+
+          x:{grid:{display:false}},
+
+          y:{
+
+            beginAtZero:true,
+
+            grid:{color:"#26394a"}
+
+          }
+
+        }
+
+      }
+
+    }
+
+  );
+
+}
+
+
+function updateAttributeChart(){
+
+  const result = getAttributeSummary();
+
+  destroyChart("attributes");
+
+  if(!result){
+
+    document.getElementById("attributeNote").textContent =
+      "Upload vector data with numeric attributes to populate this chart.";
+
+    return;
+
+  }
+
+  const vals = result.values.slice(0,1000);
+
+  document.getElementById("attributeNote").textContent =
+
+    "Attribute: " + result.key +
+    " | " + vals.length +
+    " valid numeric records within the selected area.";
+
+
+  state.charts.attributes = new Chart(
+
+    document.getElementById("attributeChart"),
+
+    {
+
+      type:"bar",
+
+      data:{
+
+        labels:vals.map((_,i)=>i+1),
+
+        datasets:[{
+
+          label:result.key,
+
+          data:vals,
+
+          backgroundColor:"#49d5d0"
+
+        }]
+
+      },
+
+      options:{
+
+        responsive:true,
+
+        maintainAspectRatio:true,
+
+        plugins:{
+
+          legend:{display:false}
+
+        },
+
+        scales:{
+
+          x:{display:false},
+
+          y:{grid:{color:"#26394a"}}
+
+        }
+
+      }
+
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   16. DATA TABLE
+========================================================= */
+
+function updateDataTable(){
+
+  const osmCount = Object.values(state.osm)
+    .reduce((a,b)=>a+b.length,0);
+
+  const filteredOSMCount =
+
+    filteredData.buildings.length +
+    filteredData.roads.length +
+    filteredData.green.length +
+    filteredData.water.length +
+    filteredData.industry.length;
+
+
+  const rows = [
+
+    [
+      "Administrative",
+      state.filteredAdmin.length,
+      state.admin ? "Loaded" : "Pending"
+    ],
+
+    [
+      "Environmental",
+      filteredData.environmental.length,
+      state.environmental.length ? "Filtered" : "Pending"
+    ],
+
+    [
+      "OpenStreetMap",
+      filteredOSMCount,
+      osmCount ? "Filtered" : "Pending"
+    ],
+
+    [
+      "CSV points",
+      filteredData.csv.length,
+      state.csvCount ? "Filtered" : "Pending"
+    ]
+
+  ];
+
+
+  document.getElementById("dataTable").innerHTML =
+    rows.map(r=>
+
+      "<tr><td>" +
+      escapeHTML(r[0]) +
+      "</td><td>" +
+      r[1].toLocaleString() +
+      "</td><td>" +
+      escapeHTML(r[2]) +
+      "</td></tr>"
+
+    ).join("");
+
+}
+
+
+/* =========================================================
+   17. EXPORT FUNCTIONS
+========================================================= */
+
+function downloadBlob(content,type,filename){
+
+  const blob = new Blob([content],{type});
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+}
+
+
+function getSelectedExportFeatures(){
+
+  return [
+
+    ...filteredData.environmental,
+    ...filteredData.buildings,
+    ...filteredData.roads,
+    ...filteredData.green,
+    ...filteredData.water,
+    ...filteredData.industry,
+    ...filteredData.csv,
+    ...state.filteredAdmin
+
+  ];
+
+}
+
+
+document.getElementById("exportGeo").addEventListener(
+  "click",
+  ()=>{
+
+    const all = getSelectedExportFeatures();
+
+    if(!all.length){
+
+      alert("No vector data available for export.");
+
+      return;
+
+    }
+
+    const geojson = {
+
+      type:"FeatureCollection",
+
+      features:all
+
+    };
+
+    downloadBlob(
+
+      JSON.stringify(geojson,null,2),
+
+      "application/geo+json",
+
+      "gambia_selected_area_environment.geojson"
+
+    );
+
+  }
+);
+
+
+document.getElementById("exportCSV").addEventListener(
+  "click",
+  ()=>{
+
+    const data = [
+
+      ["Indicator","Value","Unit"],
+
+      ["Mapped buildings",
+        filteredData.buildings.length,"Features"],
+
+      ["Mapped road features",
+        filteredData.roads.length,"Features"],
+
+      ["Road length",
+        lengthKm(filteredData.roads),"km"],
+
+      ["Green space area",
+        areaKm2(filteredData.green),"km2"],
+
+      ["Water area",
+        areaKm2(filteredData.water),"km2"],
+
+      ["Industrial features",
+        filteredData.industry.length,"Features"],
+
+      ["Uploaded environmental features",
+        filteredData.environmental.length,"Features"],
+
+      ["CSV points",
+        filteredData.csv.length,"Points"]
+
+    ];
+
+
+    const csv = data.map(row=>
+
+      row.map(v=>
+
+        '"' + String(v).replace(/"/g,'""') + '"'
+
+      ).join(",")
+
+    ).join("\n");
+
+
+    downloadBlob(
+
+      csv,
+
+      "text/csv;charset=utf-8",
+
+      "gambia_selected_area_environment_analytics.csv"
+
+    );
+
+  }
+);
+
+
+/* =========================================================
+   18. CLEAR UPLOADED DATA
+========================================================= */
+
+function clearUploadedData(){
+
+  state.admin = null;
+
+  state.adminFeatures = [];
+
+  state.filteredAdmin = [];
+
+  state.environmental = [];
+
+  state.csvFeatures = [];
+
+  state.csvCount = 0;
+
+  state.osm = {
+
+    buildings:[],
+    roads:[],
+    green:[],
+    water:[],
+    industry:[]
+
+  };
+
+
+  if(state.rasterLayer){
+
+    groups.raster.removeLayer(state.rasterLayer);
+
+  }
+
+  state.rasterLayer = null;
+
+  state.raster = null;
+
+
+  Object.values(groups).forEach(g=>{
+
+    g.clearLayers();
+
+  });
+
+
+  [
+    "adminFile",
+    "vectorFile",
+    "csvFile",
+    "rasterFile"
+  ].forEach(id=>{
+
+    document.getElementById(id).value="";
+
+  });
+
+
+  adminFields = {
+
+    region:null,
+    district:null,
+    ward:null
+
+  };
+
+
+  populateSelect("region",[],"All regions");
+
+  populateSelect("district",[],"All districts");
+
+  populateSelect("ward",[],"All wards");
+
+
+  document.getElementById("rasterStatus").textContent =
+    "NOT LOADED";
+
+  document.getElementById("rasterDetails").textContent =
+    "Upload GeoTIFF to visualize raster data.";
+
+
+  refreshSpatialLayers();
+
+  refreshAdmin();
+
+  updateDataTable();
+
+  setNotice("Uploaded datasets cleared.");
+
+}
+
+
+document.getElementById("clearUploads").addEventListener(
+  "click",
+  ()=>{
+
+    if(confirm("Clear all uploaded and retrieved spatial data?")){
+
+      clearUploadedData();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   19. RESET MAP AND FILTERS
+========================================================= */
+
+document.getElementById("resetMap").addEventListener(
+  "click",
+  ()=>{
+
+    clearUploadedData();
+
+    ["showAdmin","showBuildings","showRoads",
+     "showGreen","showWater","showIndustry",
+     "showEnvironmental","showCSV","showRaster"
+    ].forEach(id=>{
+
+      document.getElementById(id).checked=true;
+
+    });
+
+
+    document.getElementById("basemap").value="street";
+
+    Object.values(baseLayers).forEach(layer=>{
+
+      if(map.hasLayer(layer)){
+
+        map.removeLayer(layer);
+
+      }
+
+    });
+
+    baseLayers.street.addTo(map);
+
+    currentBasemap="street";
+
+    map.setView(GAMBIA_CENTER,8);
+
+    document.getElementById("mapStatus").textContent =
+      "GAMBIA NATIONAL VIEW";
+
+    applyVisibility();
+
+    setNotice("Map and filters reset. National view restored.");
+
+  }
+);
+
+
+/* =========================================================
+   20. MAP EVENTS AND CLOCK
+========================================================= */
+
+map.on("moveend",()=>{
+
+  document.getElementById("scaleLabel").textContent =
+
+    "WGS84 • EPSG:4326 • ZOOM " + map.getZoom();
+
+});
+
+
+function updateClock(){
+
+  document.getElementById("clock").textContent =
+
+    new Date().toLocaleString("en-GB",{
+
+      timeZone:"Africa/Banjul",
+
+      dateStyle:"medium",
+
+      timeStyle:"medium"
+
+    });
+
+}
+
+updateClock();
+
+setInterval(updateClock,1000);
+
+
+/* =========================================================
+   21. INITIALIZATION
+========================================================= */
+
+updateCharts({
+
+  buildings:0,
+  roads:0,
+  green:0,
+  water:0,
+  industry:0,
+  environmental:0,
+  csv:0
+
+});
+
+updateDataTable();
+
+updateAnalytics();
+
+map.setView(GAMBIA_CENTER,8);
+
+setNotice(
+  "Workspace ready. Upload Gambia administrative boundaries and environmental datasets to begin."
+);
+
+
+// Ensure Leaflet calculates the correct map dimensions.
+
+setTimeout(()=>map.invalidateSize(),300);
+
+window.addEventListener("resize",()=>{
+
+  map.invalidateSize();
+
+});
 
 </script>
+
 </body>
 </html>
 
